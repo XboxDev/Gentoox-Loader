@@ -18,6 +18,12 @@
 void InitFatXIcons(void);
 void InitNativeIcons(void);
 
+// These are ordered in such a way that you get either 
+// CDROM, FatX, Native | Advanced (Gentoox + MCE)
+// CDROM, Native, Advanced (MCE Only)
+// CDROM, FatX, Advanced (Gentoox only)
+// Where '|' is a new page.  This seems the neatest way of doing it.
+
 void IconMenuInit(void) {
 	int i=0;
 	ICON *iconPtr=NULL;
@@ -25,7 +31,7 @@ void IconMenuInit(void) {
 		//Add the cdrom icon - if you have two cdroms, you'll get two icons!
 		if (tsaHarddiskInfo[i].m_fAtapi) {
 			char *driveName=malloc(sizeof(char)*14);
-			sprintf(driveName,"CD-ROM (hd%c)",i ? 'b':'a');
+			sprintf(driveName,"Stardust");
 			iconPtr = (ICON *)malloc(sizeof(ICON));
 			iconPtr->iconSlot = ICON_SOURCE_SLOT2;
 			iconPtr->szCaption = driveName;
@@ -35,18 +41,14 @@ void IconMenuInit(void) {
 			AddIcon(iconPtr);
 		}
 	}
-	//Load the config file from FATX and native, and add the icons, if found.
+
+	// For the Pro/ Home Gentoox distributions.  If MCE isnt installed
+	// Gentoox Pro/ Home will be selected as the default icon.
 	InitFatXIcons();
+
+	// Largely for MCE.  MCE will get selected as the default boot icon
+	// if it is installed.
 	InitNativeIcons();
-	
-#ifdef ETHERBOOT
-	//Etherboot icon - if it's compiled in, it's always available.
-	iconPtr = (ICON *)malloc(sizeof(ICON));
-	iconPtr->iconSlot = ICON_SOURCE_SLOT3;
-	iconPtr->szCaption = "Etherboot";
-	iconPtr->functionPtr = BootFromEtherboot;
-	AddIcon(iconPtr);
-#endif	
 
 #ifdef ADVANCED_MENU
 	iconPtr = (ICON *)malloc(sizeof(ICON));
@@ -56,6 +58,16 @@ void IconMenuInit(void) {
 	iconPtr->functionDataPtr = (void *)TextMenuInit();
 	AddIcon(iconPtr);
 #endif
+
+#ifdef ETHERBOOT
+	//Etherboot icon - if it's compiled in, it's always available.
+	iconPtr = (ICON *)malloc(sizeof(ICON));
+	iconPtr->iconSlot = ICON_SOURCE_SLOT3;
+	iconPtr->szCaption = "Etherboot";
+	iconPtr->functionPtr = BootFromEtherboot;
+	AddIcon(iconPtr);
+#endif	
+
 	//Set this to point to the icon you want to be selected by default.
 	//Otherwise, leave it alone, and the first icon will be selected.
 	//selectedIcon = iconPtr;
@@ -76,7 +88,7 @@ void InitFatXIcons(void) {
 				//There is a config file present.
 				iconPtr = (ICON *)malloc(sizeof(ICON));
 		   		iconPtr->iconSlot = ICON_SOURCE_SLOT4;
-				iconPtr->szCaption="FatX (E:)";
+				iconPtr->szCaption="   FatX";
 				iconPtr->functionPtr = DrawBootMenu;
 				iconPtr->functionDataPtr = (void *)entry;
 		   		AddIcon(iconPtr);
@@ -116,7 +128,7 @@ void InitNativeIcons(void) {
 						iconPtr = (ICON *)malloc(sizeof(ICON));
 			  			iconPtr->iconSlot = ICON_SOURCE_SLOT1;
 						iconPtr->szCaption=malloc(10);
-						sprintf(iconPtr->szCaption, "hd%c%d", driveId+'a', n);
+						sprintf(iconPtr->szCaption, "  Native");
 						iconPtr->functionPtr = DrawBootMenu;
 						iconPtr->functionDataPtr = (void *)entry;
 			  			AddIcon(iconPtr);
@@ -124,7 +136,6 @@ void InitNativeIcons(void) {
 					}
 				}
 			}
-			
 		}
 	}
 }

@@ -13,3 +13,10 @@ void FlashBiosFromCD(void *cdromId) {
 	BootLoadFlashCD(*(int *)cdromId);
 #endif
 }
+
+void enableLwip(void *whatever) {
+#ifdef FLASH
+	initialiseNetwork();
+	netflash();
+#endif
+}

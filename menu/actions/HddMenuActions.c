@@ -25,7 +25,7 @@ void LockHdd(void *driveId) {
 	printk("as it could save your drive!\n\n");
 	printk("The normal password (user password) the drive is being locked with is as follows:\n\n");
 	printk("                              ");
-	VIDEO_ATTR=0xff0000;
+	VIDEO_ATTR=0xffef37;
 	for (i=0; i<20; i++) {
 		printk("\2%02x \2",password[i]);
 		if ((i+1)%5 == 0) {
@@ -76,16 +76,14 @@ void DisplayHddPassword(void *driveId) {
 	
 	printk("The normal password (user password) for this drive is as follows:\n\n");
 	printk("                              ");
-	VIDEO_ATTR=0xff0000;
+	VIDEO_ATTR=0xffef37;
 	for (i=0; i<20; i++) {
 		printk("\2%02x \2",password[i]);
 		if ((i+1)%5 == 0) {
 			printk("\n\n                              ");
 		}
 	}	
-
 	VIDEO_ATTR=0xffffff;
-
 	printk("\n\nPress Button A to continue");
 
 	while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(100);

@@ -162,7 +162,7 @@ extern void BootStartBiosLoader ( void ) {
 			// The Checksum is good                          
 			// We start the Cromwell immediatly
                         
-                        I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_RED1 | I2C_LED_RED2 | I2C_LED_RED3 );
+			I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_RED1 | I2C_LED_RED2 | I2C_LED_RED3 );
 		
 			BufferIN = (unsigned char*)(CROMWELL_compress_temploc);
 			BufferINlen=compressed_image_size;
