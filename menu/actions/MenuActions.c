@@ -33,8 +33,8 @@ void BootFromCD(void *data) {
 	int nTempCursorY = VIDEO_CURSOR_POSY; 
 	CONFIGENTRY *config = LoadConfigCD(*(int*)data);
 	if (config==NULL) {
-		printk("Boot from CD failed.\nCheck that linuxboot.cfg exists.\n");
-		wait_ms(2000);
+		printk("\n\nCould not boot Stardust!\nTry different media and a lower burning speed.\n");
+		wait_ms(5000);
 		//Clear the screen and return to the menu
 		BootVideoClearScreen(&jpegBackdrop, nTempCursorY, VIDEO_CURSOR_POSY+1);	
 		return;
@@ -80,12 +80,13 @@ void DrawBootMenu(void *rootEntry) {
 	for (currentConfigEntry = configEntry; currentConfigEntry != NULL; 
 		currentConfigEntry = currentConfigEntry->nextConfigEntry) {
 	
-		menuPtr = malloc(sizeof(TEXTMENUITEM*));
+		menuPtr = (TEXTMENUITEM *)malloc(sizeof(TEXTMENUITEM*));
 		memset(menuPtr, 0x00, sizeof(menuPtr));
 		if (currentConfigEntry->title == NULL) {
 			strcpy(menuPtr->szCaption,"Untitled");
+		} else { 
+			strncpy(menuPtr->szCaption,currentConfigEntry->title,50);
 		}
-		else strncpy(menuPtr->szCaption,currentConfigEntry->title,50);
 		menuPtr->functionPtr = BootMenuEntry;
 		menuPtr->functionDataPtr = (void *)currentConfigEntry;
 		//If this config entry is default, mark the menu item as default.
@@ -118,6 +119,7 @@ void DrawChildTextMenu(void *menu) {
 #ifdef ETHERBOOT 
 extern int etherboot(void);
 void BootFromEtherboot(void *data) {
+	busyLED();
 	etherboot();
 }
 #endif

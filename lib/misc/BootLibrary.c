@@ -49,6 +49,29 @@ size_t strlen(const char * s)
 	return __res;
 }
 
+int _strncmp(const char *sz1, const char *sz2, int nMax)
+{
+	while((*sz1) && (*sz2) && nMax--) {
+	if(*sz1 != *sz2) return (*sz1 - *sz2);
+		sz1++; sz2++;
+	}
+	if(nMax==0) return 0;
+	if((*sz1) || (*sz2)) return 0;
+	return 0; // used up nMax
+}
+
+int _strncasecmp(const char *sz1, const char *sz2, int nMax)
+{
+	while((*sz1) && (*sz2) && nMax--) {
+	if(tolower(*sz1) != tolower(*sz2)) return (*sz1 - *sz2);
+		sz1++; sz2++;
+	}
+
+	if(nMax==0) return 0;
+
+	if((tolower(*sz1)) || (tolower(*sz2))) return 0;
+	return 0; // used up nMax
+}
 
 int tolower(int ch) 
 {
