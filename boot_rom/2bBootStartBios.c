@@ -195,7 +195,6 @@ extern void BootStartBiosLoader ( void ) {
 	}
 	
 	// Bad, we did not get a valid im age to RAM, we stop and display a error
-	//setLED("rrrr");	
 
 	setLED("oooo");
         
