@@ -1,3 +1,5 @@
+#ifndef _LEDMENUACTIONS_H_
+#define _LEDMENUACTIONS_H_
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -6,12 +8,18 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "boot.h"
-#include "BootIde.h"
-#include "video.h"
 
-void LockHdd(void *driveId);
+void LEDGood(void *);
+void LEDError(void *);
+void LEDBusy(void *);
+void LEDImportant(void *);
+void LEDInput(void *);
+void LEDDownloading(void *);
+void LEDUber(void *);
+void LEDHigh(void *);
+void LEDMid(void *);
+void LEDLow(void *);
+void LEDHeader(char *name, char *pattern);
+void LEDFooter(void);
 
-void UnlockHdd(void *driveId);
-
-void DisplayHddPassword(void *driveId);
+#endif

@@ -49,7 +49,7 @@ void print_config(void)
 {
 	const struct pci_driver *driver;
 	for(driver = pci_drivers; driver < pci_drivers_end; driver++) {
-		printf("[%s]", driver->name);
+		//printf("[%s]", driver->name);
 	}
 }
 #endif	
@@ -57,7 +57,7 @@ void print_config(void)
 {
 	const struct isa_driver *driver;
 	for(driver = isa_drivers; driver < isa_drivers_end; driver++) {
-		printf("[%s]", driver->name);
+		//printf("[%s]", driver->name);
 	}
 
 }
@@ -83,7 +83,7 @@ static int pci_probe(struct dev *dev, const char *type_name)
  *      will be repeated.
  */
 	struct pci_probe_state *state = &dev->state.pci;
-	printf("Probing pci %s...\n", type_name);
+	//printf("Probing pci %s...\n", type_name);
 	if (dev->how_probe == PROBE_FIRST) {
 		state->advance    = 1;
 		state->dev.driver = 0;
@@ -115,7 +115,7 @@ static int pci_probe(struct dev *dev, const char *type_name)
 		dev->devid.device_id = htons(state->dev.dev_id);
 		/* FIXME how do I handle dev->index + PROBE_AGAIN?? */
 		
-		printf("[%s]", state->dev.name);
+		//printf("[%s]", state->dev.name);
 		if (state->dev.driver->probe(dev, &state->dev)) {
 			state->advance = (dev->index == -1);
 			return PROBE_WORKED;
@@ -160,7 +160,7 @@ static int isa_probe(struct dev *dev, const char *type_name)
 		if (dev->how_probe != PROBE_AWAKE) {
 			dev->type_index++;
 		}
-		printf("[%s]", state->driver->name);
+		//printf("[%s]", state->driver->name);
 		dev->devid.bus_type = ISA_BUS_TYPE;
 		/* FIXME how do I handle dev->index + PROBE_AGAIN?? */
 		/* driver will fill in vendor and device IDs */

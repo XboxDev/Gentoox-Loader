@@ -14,26 +14,12 @@
 #include "BootFlash.h"
 #include "memory_layout.h"
 
-void DisplayFlashProgressBar(int, int, unsigned long);
-
-// Please keep in order by ID.
+// A bit hacky, but easier to maintain.
 const KNOWN_FLASH_TYPE aknownflashtypesDefault[] = {
-	{ 0x01, 0xa4, "AMD - Am29F040B",0x80000 },
-	{ 0x01, 0xad, "AMD - Am29F016", 0x200000 },
-	{ 0x01, 0xda, "AMD - Am29LV800B", 0x100000 },
-	{ 0x01, 0xd5, "AMD - Am29F080B",0x100000 },
-	{ 0x04, 0xd5, "Fujitsu - MBM29F080A",0x100000 },
-	{ 0x20, 0xb0, "ST - M29F002BT",0x40000 },
-	{ 0x20, 0xf1, "ST - M29F080A",0x100000 },
-	{ 0x89, 0xa6, "Sharp LHF08CH1",0x100000 },
-	{ 0xad, 0xb0, "Hynix - HY29F002TT-90",0x40000 },
-	{ 0xad, 0xd5, "Hynix - HY29F080",0x100000 },
-	{ 0xbf, 0x61, "SST SST49LF020",0x40000 },
-	{ 0xc2, 0x36, "Macronix - MX29F022NTPC",0x40000 },
-	{ 0xda, 0x0b, "Winbond - W49F002U",0x40000 },
-	{ 0xda, 0x8c, "Winbond W49F020",0x40000 },
-	{ 0, 0, "", 0 } // terminator
+#include "flashtypes.h"
 };
+
+void DisplayFlashProgressBar(int, int, unsigned long);
 
  // callback to show progress
 bool BootFlashUserInterface(void * pvoidObjectFlash, ENUM_EVENTS ee, u32 dwPos, u32 dwExtent) {
@@ -103,14 +89,33 @@ int BootReflashAndReset(u8 *pbNewData, u32 dwStartOffset, u32 dwLength)
 	
 	// committed to reflash now
 	while(fMore) {
+		VIDEO_ATTR=0xffef37;
+		printk("\n\n\n\n\n\n\n\n\n\n\n\n\n           \2Flashing BIOS...\n\2\n");
+		VIDEO_ATTR=0xffffff;
+		printk("           WARNING!\n"
+				 "           Do not turn off your console during this process!\n"
+				 "           Your console should automatically reboot when this\n"
+				 "           is done.  However, if it does not, please manually\n"
+				 "           do so by pressing the power button once the LED has\n"
+				 "           turned flashing amber (oxox)\n");
+
 		if(BootFlashEraseMinimalRegion(&of)) {
 			if(BootFlashProgram(&of, pbNewData)) {
 				fMore=false;  // good situation
+
+				// Set LED to oxox.
+				inputLED();
+
+				I2CRebootSlow();
+				while(1);
+
 			} else { // failed program
-				;
+				printk("Programming failed...\n");
+				while(1);
 			}
 		} else { // failed erase
-			;
+			printk("Erasing failed...\n");
+			while(1);
 		}
 	}
 	return 0; // keep compiler happy
