@@ -85,13 +85,18 @@ OBJECTS-CROM += $(TOPDIR)/obj/TextMenu.o
 OBJECTS-CROM += $(TOPDIR)/obj/TextMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/VideoMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/ResetMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/HDDFlashMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/CDMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/FlashMenuInit.o
-OBJECTS-CROM += $(TOPDIR)/obj/HddMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/HDDMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/LEDMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/MenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/VideoMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/ResetMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/FlashMenuActions.o
-OBJECTS-CROM += $(TOPDIR)/obj/HddMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/HDDMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/CDMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/LEDMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/Confirm.o
 OBJECTS-CROM += $(TOPDIR)/obj/LoadLinux.o
 OBJECTS-CROM += $(TOPDIR)/obj/setup.o
@@ -142,6 +147,12 @@ OBJECTS-CROM += $(TOPDIR)/obj/etherboot_config.o
 OBJECTS-CROM += $(TOPDIR)/obj/xbox_main.o
 OBJECTS-CROM += $(TOPDIR)/obj/elf.o
 endif
+
+SUBDIRS += lwip
+OBJECTS-LWIP = $(addprefix $(TOPDIR)/obj/,mem.o memp.o netif.o pbuf.o raw.o stats.o sys.o tcp.o tcp_in.o tcp_out.o udp.o dhcp.o icmp.o ip.o inet.o ip_addr.o ip_frag.o etharp.o ebd.o webserver.o)
+#httpd.o http-pages.o)
+OBJECTS-CROM += $(OBJECTS-LWIP)
+
 
 RESOURCES = $(TOPDIR)/obj/backdrop.elf
 

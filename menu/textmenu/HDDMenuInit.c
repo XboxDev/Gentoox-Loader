@@ -10,48 +10,48 @@
 #include "include/boot.h"
 #include "BootIde.h"
 #include "TextMenu.h"
-#include "HddMenuActions.h"
+#include "HDDMenuActions.h"
 
-TEXTMENU *HddMenuInit(void) {
+TEXTMENU *HDDMenuInit(void) {
 	TEXTMENUITEM *itemPtr;
 	TEXTMENU *menuPtr;
 	int i=0;
 
-	menuPtr = malloc(sizeof(TEXTMENU));
+	menuPtr = (TEXTMENU*)malloc(sizeof(TEXTMENU));
 	memset(menuPtr,0x00,sizeof(TEXTMENU));
-	strcpy(menuPtr->szCaption, "Hdd Menu");
+	strcpy(menuPtr->szCaption, "HDD Menu");
 
 	for (i=0; i<2; ++i) {
 		if (tsaHarddiskInfo[i].m_fDriveExists && !tsaHarddiskInfo[i].m_fAtapi) {
 			//If it's not ATAPI, it must be IDE
 			if((tsaHarddiskInfo[i].m_securitySettings &0x0004)==0x0004) {
 				//This drive is locked - produce an unlock menu
-				itemPtr = malloc(sizeof(TEXTMENUITEM));
+				itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 				memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 				sprintf(itemPtr->szCaption,"Unlock HDD (hd%c)",i ? 'b':'a');
-				itemPtr->functionPtr= UnlockHdd;
-				itemPtr->functionDataPtr = malloc(sizeof(int));
-				*(int*)itemPtr->functionDataPtr = i;
+				itemPtr->functionPtr= UnlockHDD;
+    				itemPtr->functionDataPtr = malloc(sizeof(int));
+                        	*(int*)itemPtr->functionDataPtr = i;
 				TextMenuAddItem(menuPtr, itemPtr);
 			}
 			else {
 				//This drive is unlocked - produce an lock menu
-				itemPtr = malloc(sizeof(TEXTMENUITEM));
+				itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 				memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 				sprintf(itemPtr->szCaption,"Lock HDD (hd%c)",i ? 'b':'a');
-				itemPtr->functionPtr= LockHdd;
-				itemPtr->functionDataPtr = malloc(sizeof(int));
-				*(int*)itemPtr->functionDataPtr = i;
+				itemPtr->functionPtr= LockHDD;
+    				itemPtr->functionDataPtr = malloc(sizeof(int));
+                        	*(int*)itemPtr->functionDataPtr = i;
 				TextMenuAddItem(menuPtr, itemPtr);
 			}
 	
 			//Add a 'display password' menu
-			itemPtr = malloc(sizeof(TEXTMENUITEM));
+			itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 			memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 			sprintf(itemPtr->szCaption,"Display HDD password (hd%c)",i ? 'b':'a');
-			itemPtr->functionPtr= DisplayHddPassword;
-			itemPtr->functionDataPtr = malloc(sizeof(int));
-			*(int*)itemPtr->functionDataPtr = i;
+			itemPtr->functionPtr= DisplayHDDPassword;
+    			itemPtr->functionDataPtr = malloc(sizeof(int));
+                       	*(int*)itemPtr->functionDataPtr = i;
 			TextMenuAddItem(menuPtr, itemPtr);
 		
 		}

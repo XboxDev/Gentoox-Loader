@@ -1,2 +1,2 @@
-O_TARGET := TextMenu.o TextMenuInit.o VideoMenuInit.o ResetMenuInit.o FlashMenuInit.o HddMenuInit.o
+O_TARGET := TextMenu.o TextMenuInit.o VideoMenuInit.o ResetMenuInit.o FlashMenuInit.o HDDMenuInit.o HDDFlashMenuInit.o LEDMenuInit.o CDMenuInit.o
 include $(TOPDIR)/Rules.make
