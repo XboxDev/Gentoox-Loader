@@ -9,3 +9,5 @@
 #include "include/config.h"
 
 void FlashBiosFromCD(void *cdromId);
+void enableLwip(void *whatever);
+
