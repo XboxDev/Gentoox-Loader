@@ -143,6 +143,12 @@ OBJECTS-CROM += $(TOPDIR)/obj/xbox_main.o
 OBJECTS-CROM += $(TOPDIR)/obj/elf.o
 endif
 
+SUBDIRS += lwip
+OBJECTS-LWIP = $(addprefix $(TOPDIR)/obj/,mem.o memp.o netif.o pbuf.o raw.o stats.o sys.o tcp.o tcp_in.o tcp_out.o udp.o dhcp.o icmp.o ip.o inet.o ip_addr.o ip_frag.o etharp.o ebd.o webserver.o)
+#httpd.o http-pages.o)
+OBJECTS-CROM += $(OBJECTS-LWIP)
+
+
 RESOURCES = $(TOPDIR)/obj/backdrop.elf
 
 export INCLUDE

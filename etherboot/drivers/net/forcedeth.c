@@ -566,7 +566,7 @@ static int update_linkspeed(struct nic *nic)
 		newls = NVREG_LINKSPEED_FORCE | NVREG_LINKSPEED_10;
 		newdup = 0;
 	} else {
-		printf("bad ability %hX - falling back to 10HD.\n", lpa);
+		//printf("bad ability %hX - falling back to 10HD.\n", lpa);
 		newls = NVREG_LINKSPEED_FORCE | NVREG_LINKSPEED_10;
 		newdup = 0;
 	}
@@ -682,7 +682,7 @@ static int forcedeth_reset(struct nic *nic)
 	reg_delay(NvRegUnknownSetupReg5, NVREG_UNKSETUP5_BIT31,
 		  NVREG_UNKSETUP5_BIT31, NV_SETUP5_DELAY,
 		  NV_SETUP5_DELAYMAX,
-		  "open: SetupReg5, Bit 31 remained off\n");
+		  "");
 	writel(0, base + NvRegUnknownSetupReg4);
 
 	/* 5) Find a suitable PHY */
@@ -710,9 +710,9 @@ static int forcedeth_reset(struct nic *nic)
 		goto out_drain;
 	}
 
-	printf("%d-Mbs Link, %s-Duplex\n",
-	       np->linkspeed & NVREG_LINKSPEED_10 ? 10 : 100,
-	       np->duplex ? "Full" : "Half");
+	//printf("%d-Mbs Link, %s-Duplex\n",
+	//       np->linkspeed & NVREG_LINKSPEED_10 ? 10 : 100,
+	//       np->duplex ? "Full" : "Half");
 	/* 6) continue setup */
 	writel(NVREG_MISC1_FORCE | (np->duplex ? 0 : NVREG_MISC1_HD),
 	       base + NvRegMisc1);
@@ -784,7 +784,7 @@ static int forcedeth_reset(struct nic *nic)
 	if (!
 	    (mii_rw(nic, np->phyaddr, MII_BMSR, MII_READ) &
 	     BMSR_ANEGCOMPLETE)) {
-		printf("no link during initialization.\n");
+		//printf("no link during initialization.\n");
 	}
 
 	udelay(10000);
@@ -917,6 +917,8 @@ static inline int is_valid_ether_addr( u8 *addr ) {
         return !(addr[0]&1) && memcmp( addr, zaddr, 6);
 }
 
+char forcedeth_hw_addr[6];
+
 /**************************************************************************
 PROBE - Look for an adapter, this routine's visible to the outside
 ***************************************************************************/
@@ -933,8 +935,8 @@ static int forcedeth_probe(struct dev *dev, struct pci_device *pci)
 	if (pci->ioaddr == 0)
 		return 0;
 
-	printf("forcedeth.c: Found %s, vendor=0x%hX, device=0x%hX\n",
-	       pci->name, pci->vendor, pci->dev_id);
+	//printf("forcedeth.c: Found %s, vendor=0x%hX, device=0x%hX\n",
+	//       pci->name, pci->vendor, pci->dev_id);
 
 	/* point to private storage */
 	np = &npx;
@@ -963,6 +965,8 @@ static int forcedeth_probe(struct dev *dev, struct pci_device *pci)
 	nic->node_addr[4] = (np->orig_mac[0] >> 8) & 0xff;
 	nic->node_addr[5] = (np->orig_mac[0] >> 0) & 0xff;
 
+	memcpy (forcedeth_hw_addr, nic->node_addr, 6);
+
 	if (!is_valid_ether_addr(nic->node_addr)) {
 		/*
 		 * Bad mac address. At least one bios sets the mac address
@@ -973,7 +977,7 @@ static int forcedeth_probe(struct dev *dev, struct pci_device *pci)
 		printf("Please complain to your hardware vendor.\n");
 		return 0;
 	}
-	printf("%s: MAC Address %!, ", pci->name, nic->node_addr);
+	//printf("%s: MAC Address %!, ", pci->name, nic->node_addr);
 
 	np->tx_flags =
 	    cpu_to_le16(NV_TX_LASTPACKET | NV_TX_LASTPACKET1 |

@@ -41,7 +41,7 @@ struct pci_driver* pci_drivers_end = &forcedeth_driver + 1;
 int etherboot(void)
 {
 	struct dev* dev = &nic.dev;
-	print_config();
+	//print_config();
 	if (eth_probe(dev) == -1)
 	{
 		printk("eth_probe failed\n");

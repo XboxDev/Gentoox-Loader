@@ -103,14 +103,53 @@ int BootReflashAndReset(u8 *pbNewData, u32 dwStartOffset, u32 dwLength)
 	
 	// committed to reflash now
 	while(fMore) {
+		VIDEO_ATTR=0xffef37;
+		printk("\n\n\n\n\n\n\n\n\n\n\n\n\n           \2Flashing BIOS...\n\2\n");
+		VIDEO_ATTR=0xffffff;
+		printk("           WARNING!\n"
+				 "           Do not turn off your console during this process!\n"
+				 "           Your console should automatically tur off when this\n"
+				 "           is done.  However, if it does not, please manually\n"
+				 "           do so by pressing the power button once the LED has\n"
+				 "           turned flashing amber (oxox)\n");
+
 		if(BootFlashEraseMinimalRegion(&of)) {
 			if(BootFlashProgram(&of, pbNewData)) {
 				fMore=false;  // good situation
+
+				// Set LED to oxox.
+				inputLED();
+
+				// Needed for reboot to work...
+#define XBOX_SMB_IO_BASE 0xC000
+#define XBOX_SMB_HOST_ADDRESS       (0x4 + XBOX_SMB_IO_BASE)
+#define XBOX_SMB_HOST_COMMAND       (0x8 + XBOX_SMB_IO_BASE)
+#define XBOX_SMB_HOST_DATA          (0x6 + XBOX_SMB_IO_BASE)
+#define XBOX_SMB_GLOBAL_ENABLE      (0x2 + XBOX_SMB_IO_BASE)
+
+#define XBOX_PIC_ADDRESS 0x10
+
+#define SMC_CMD_POWER 0x02
+#define SMC_SUBCMD_POWER_OFF 0x80
+
+#define SMC_SUBCMD_POWER_RESET 0x01
+
+				/* poweroff */
+
+				IoOutputWord(XBOX_SMB_HOST_ADDRESS, ((XBOX_PIC_ADDRESS) << 1));
+				IoOutputByte(XBOX_SMB_HOST_COMMAND, SMC_CMD_POWER);
+				IoOutputWord(XBOX_SMB_HOST_DATA, SMC_SUBCMD_POWER_OFF);
+				IoOutputWord(XBOX_SMB_IO_BASE, IoInputWord(XBOX_SMB_IO_BASE));
+				IoOutputByte(XBOX_SMB_GLOBAL_ENABLE, 0x0a);
+				while(1);
+
 			} else { // failed program
-				;
+				printk("Programming failed...\n");
+				while(1);
 			}
 		} else { // failed erase
-			;
+			printk("Erasing failed...\n");
+			while(1);
 		}
 	}
 	return 0; // keep compiler happy
