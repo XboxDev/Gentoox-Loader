@@ -22,6 +22,127 @@ int checkForLastDirectoryEntry(unsigned char* entry) {
 	return 0;
 }
 
+int FATXListDir(FATXPartition *partition, int clusterId, char **res, int reslen, char *prefix){
+	unsigned char* curEntry;
+	unsigned char clusterData[partition->clusterSize];
+	int i = 0;
+	int c = 0;
+	u_int32_t filenameSize;
+	u_int32_t entryClusterId;
+	char foundFilename[50];
+
+	while(clusterId != -1) {
+		// load cluster data
+		LoadFATXCluster(partition, clusterId, clusterData);
+
+		// loop through it, outputing entries
+		for(i=0; i< partition->clusterSize / FATX_DIRECTORYENTRY_SIZE; i++) {
+			// work out the currentEntry
+			curEntry = clusterData + (i * FATX_DIRECTORYENTRY_SIZE);
+
+			// first of all, check that it isn't an end of directory marker
+			if (checkForLastDirectoryEntry(curEntry)) {
+				return c;
+			}
+
+			// get the filename size
+			filenameSize = curEntry[0];
+
+			// check if file is deleted
+			if (filenameSize == 0xE5) {
+				continue;
+			}
+
+			// check size is OK
+			if ((filenameSize < 1) || (filenameSize > FATX_FILENAME_MAX)) {
+#ifdef FATX_INFO
+				printk("Invalid filename size: %i\n", filenameSize);
+#endif
+				continue;
+			}
+
+			res[c] = malloc (filenameSize + 1 + strlen (prefix));
+			strcpy (res[c], prefix);
+			memcpy(res[c]+strlen (prefix), curEntry+2, filenameSize);
+			res[c][filenameSize + strlen (prefix)] = '\0';
+
+			c++;
+			if (c >= reslen)
+				return c;
+
+		}
+		// Find next cluster
+		clusterId = getNextClusterInChain(partition, clusterId);
+	}
+
+	return c;
+}
+
+int FATXFindDir(FATXPartition *partition, int clusterId, char *dir){
+	unsigned char* curEntry;
+	unsigned char clusterData[partition->clusterSize];
+	int i = 0;
+	u_int32_t filenameSize;
+	u_int32_t flags;
+	u_int32_t entryClusterId;
+	char seekFilename[50];
+	char foundFilename[50];
+
+	while(clusterId != -1) {
+		// load cluster data
+		LoadFATXCluster(partition, clusterId, clusterData);
+
+		// loop through it, outputing entries
+		for(i=0; i< partition->clusterSize / FATX_DIRECTORYENTRY_SIZE; i++) {
+			// work out the currentEntry
+			curEntry = clusterData + (i * FATX_DIRECTORYENTRY_SIZE);
+
+			// first of all, check that it isn't an end of directory marker
+			if (checkForLastDirectoryEntry(curEntry)) {
+				return;
+			}
+
+			// get the filename size
+			filenameSize = curEntry[0];
+
+			// check if file is deleted
+			if (filenameSize == 0xE5) {
+				continue;
+			}
+
+			// check size is OK
+			if ((filenameSize < 1) || (filenameSize > FATX_FILENAME_MAX)) {
+#ifdef FATX_INFO
+				printk("Invalid filename size: %i\n", filenameSize);
+#endif
+				continue;
+			}
+
+			// extract the filename
+			memset(foundFilename, 0, 50);
+			memcpy(foundFilename, curEntry+2, filenameSize);
+			foundFilename[filenameSize] = 0;
+
+			// get rest of data
+			flags = curEntry[1];
+			entryClusterId = *((u_int32_t*) (curEntry + 0x2c));
+
+			// is it what we're looking for...  We use _strncasecmp since fatx
+			// isnt case sensitive.
+			if (strlen(dir)==strlen(foundFilename) && _strncasecmp(foundFilename, dir,strlen(dir)) == 0) {
+				if (flags & FATX_FILEATTR_DIRECTORY) {
+					return entryClusterId;
+				} else {
+					return -1;
+				}
+			}
+		}
+		// Find next cluster
+		clusterId = getNextClusterInChain(partition, clusterId);
+	}
+
+}
+
 int LoadFATXFilefixed(FATXPartition *partition,char *filename, FATXFILEINFO *fileinfo,u8* Position) {
 
 	if(partition == NULL) {
@@ -506,7 +627,7 @@ int _FATXFindFile(FATXPartition* partition,
 			fileSize = *((u_int32_t*) (curEntry + 0x30));
 
 			// is it what we're looking for...
-			if (strlen(seekFilename)==strlen(foundFilename) && strncmp(foundFilename, seekFilename,strlen(seekFilename)) == 0) {
+			if (strlen(seekFilename)==strlen(foundFilename) && _strncasecmp(foundFilename, seekFilename,strlen(seekFilename)) == 0) {
 				// if we're looking for a directory and found a directory
 				if (lookForDirectory) {
 					if (flags & FATX_FILEATTR_DIRECTORY) {
