@@ -37,26 +37,33 @@ unsigned long virt_offset = 0;
 
 struct pci_driver* pci_drivers = &forcedeth_driver;
 struct pci_driver* pci_drivers_end = &forcedeth_driver + 1;
+struct dev* dev = &nic.dev;
 
-int etherboot(void)
+int initialiseNetwork(void)
 {
-	struct dev* dev = &nic.dev;
-	print_config();
+	//print_config();
 	if (eth_probe(dev) == -1)
 	{
 		printk("eth_probe failed\n");
 	}
-	else 
+}
+
+int etherboot(void)
+{
+	if (eth_load_configuration(dev) != 0)
 	{
-		if (eth_load_configuration(dev) != 0)
-		{
-			printk("eth_load_configuration failed\n");
-		}
-		else
-		{
-			eth_load(dev);
-		}
+		printk("eth_load_configuration failed\n");
 	}
+	else
+	{
+		eth_load(dev);
+	}
+}
+
+int netflash(void)
+{
+	extern int run_lwip(void);
+	run_lwip();
 }
 
 int pcibios_read_config_byte(unsigned int bus, unsigned int device_fn, unsigned int where, uint8_t *value)

@@ -1,7 +1,7 @@
 ////////////////////// compile-time options ////////////////////////////////
 
 //Cromwell version number
-#define VERSION "2.41-dev"
+#define VERSION "5.3"
 
 // selects between the supported video modes, see boot.h for enum listing those available
 //#define VIDEO_PREFERRED_MODE VIDEO_MODE_800x600
@@ -15,14 +15,14 @@
 #define ADVANCED_MENU
 
 //Time to wait in seconds before auto-selecting default item
-#define BOOT_TIMEWAIT 15
+#define BOOT_TIMEWAIT 5
 
 //Uncomment to make connected Xpads rumble briefly at init.
 //#define XPAD_VIBRA_STARTUP
 
 //Uncomment for ultra-quiet mode. Menu is still present, but not
 //shown unless you move the xpad. Just backdrop->boot, otherwise
-//#define SILENT_MODE
+#define SILENT_MODE
 
 //Obsolete
 
@@ -38,3 +38,5 @@
 #define INCLUDE_SERIAL 0
 // enable trace message printing for debugging - with serial only
 #define PRINT_TRACE 0
+
+#undef ETHERBOOT

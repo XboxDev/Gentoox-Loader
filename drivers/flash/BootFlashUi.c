@@ -103,14 +103,33 @@ int BootReflashAndReset(u8 *pbNewData, u32 dwStartOffset, u32 dwLength)
 	
 	// committed to reflash now
 	while(fMore) {
+		VIDEO_ATTR=0xffef37;
+		printk("\n\n\n\n\n\n\n\n\n\n\n\n\n           \2Flashing BIOS...\n\2\n");
+		VIDEO_ATTR=0xffffff;
+		printk("           WARNING!\n"
+				 "           Do not turn off your console during this process!\n"
+				 "           Your console should automatically reboot when this\n"
+				 "           is done.  However, if it does not, please manually\n"
+				 "           do so by pressing the power button once the LED has\n"
+				 "           turned flashing amber (oxox)\n");
+
 		if(BootFlashEraseMinimalRegion(&of)) {
 			if(BootFlashProgram(&of, pbNewData)) {
 				fMore=false;  // good situation
+
+				// Set LED to oxox.
+				inputLED();
+
+				I2CRebootSlow();
+				while(1);
+
 			} else { // failed program
-				;
+				printk("Programming failed...\n");
+				while(1);
 			}
 		} else { // failed erase
-			;
+			printk("Erasing failed...\n");
+			while(1);
 		}
 	}
 	return 0; // keep compiler happy
