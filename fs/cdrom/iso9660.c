@@ -156,6 +156,7 @@ unsigned long read_file(int driveId, struct iso_directory_record *dir_read, char
 	}
 	
 //	printk("         read_file sector %d %d\n", offset, read_size);
+//	printk("         read %d\n", bytes_read);
 	
 	for(i = 0; i < (read_size >> ISOFS_BLOCK_BITS) ; i++) {
 		memset(tmpbuff, 0x0, ISO_BLOCKSIZE);

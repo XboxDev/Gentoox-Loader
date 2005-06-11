@@ -31,6 +31,10 @@ extern volatile int nInteruptable;
 volatile CURRENT_VIDEO_MODE_DETAILS vmode;
 extern KNOWN_FLASH_TYPE aknownflashtypesDefault[];
 
+void ClearScreen (void) {
+	BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
+}
+
 //////////////////////////////////////////////////////////////////////
 //
 //  BootResetAction()
@@ -42,10 +46,10 @@ extern void BootResetAction ( void ) {
 	int nTempCursorX, nTempCursorY;
 	int n, nx;
 	
-        memcpy(&cromwell_config,(void*)(0x03A00000+0x20),4);
-        memcpy(&cromwell_retryload,(void*)(0x03A00000+0x24),4);
+	memcpy(&cromwell_config,(void*)(0x03A00000+0x20),4);
+	memcpy(&cromwell_retryload,(void*)(0x03A00000+0x24),4);
 	memcpy(&cromwell_loadbank,(void*)(0x03A00000+0x28),4);
-        memcpy(&cromwell_Biostype,(void*)(0x03A00000+0x2C),4);
+	memcpy(&cromwell_Biostype,(void*)(0x03A00000+0x2C),4);
  	
 	VIDEO_CURSOR_POSX=40;
 	VIDEO_CURSOR_POSY=140; 	
@@ -79,8 +83,8 @@ extern void BootResetAction ( void ) {
 	
 	BootEepromReadEntireEEPROM();
         
-        // Load and Init the Background image
-        // clear the Video Ram
+	// Load and Init the Background image
+	// clear the Video Ram
 	memset((void *)FB_START,0x00,0x400000);
 	
 	BootVgaInitializationKernelNG((CURRENT_VIDEO_MODE_DETAILS *)&vmode);
@@ -111,16 +115,23 @@ extern void BootResetAction ( void ) {
          
 	VIDEO_CURSOR_POSY=vmode.ymargin;
 	VIDEO_CURSOR_POSX=(vmode.xmargin/*+64*/)*4;
-#ifndef SILENT_MODE	
-	if (cromwell_config==XROMWELL) 	printk("\2Xbox Linux Xromwell  " VERSION "\2\n" );
-	if (cromwell_config==CROMWELL)	printk("\2Xbox Linux Cromwell BIOS  " VERSION "\2\n" );
+
+	if (cromwell_config==XROMWELL)  printk("\2Gentoox Loader (XBE) v" VERSION "\n\n\2");
+	if (cromwell_config==CROMWELL)  printk("\2Gentoox Loader (ROM) v" VERSION "\n\n\2");
+
 	VIDEO_CURSOR_POSY=vmode.ymargin+32;
 	VIDEO_CURSOR_POSX=(vmode.xmargin/*+64*/)*4;
-	printk( __DATE__ " -  http://xbox-linux.org\n");
+	printk("Gentoox (c) ShALLaX - http://gentoox.shallax.com - ");
+	if (xbox_ram > 64) {
+		VIDEO_ATTR=0xff00ff00;
+	} else {
+		VIDEO_ATTR=0xffffa20f;
+	}
+   printk("RAM: %d", xbox_ram);
+   printk("MB   \n");
+   
 	VIDEO_CURSOR_POSX=(vmode.xmargin/*+64*/)*4;
-	printk("(C)2002-2004 Xbox Linux Team   RAM : %d MB  ",xbox_ram);
-        printk("\n");
-    
+#ifndef SILENT_MODE	
 	// capture title area
 	VIDEO_ATTR=0xffc8c8c8;
 	printk("Encoder: ");
@@ -146,20 +157,17 @@ extern void BootResetAction ( void ) {
 	nTempCursorX=VIDEO_CURSOR_POSX;
 	nTempCursorY=VIDEO_CURSOR_POSY;
 #endif
-	setLED("rrrr");
 
 	VIDEO_ATTR=0xffffffff;
 
-	// gggb while waiting for Ethernet & Hdd
-
-	setLED("gggx");
+	busyLED();
 
 	// set Ethernet MAC address from EEPROM
-        {
-	volatile u8 * pb=(u8 *)0xfef000a8;  // Ethernet MMIO base + MAC register offset (<--thanks to Anders Gustafsson)
-	int n;
-	for(n=5;n>=0;n--) { *pb++=	eeprom.MACAddress[n]; } // send it in backwards, its reversed by the driver
-        }
+	{
+		volatile u8 * pb=(u8 *)0xfef000a8;  // Ethernet MMIO base + MAC register offset (<--thanks to Anders Gustafsson)
+		int n;
+		for(n=5;n>=0;n--) { *pb++=	eeprom.MACAddress[n]; } // send it in backwards, its reversed by the driver
+	}
 #ifndef SILENT_MODE
 	BootEepromPrintInfo();
 #endif
@@ -195,23 +203,25 @@ extern void BootResetAction ( void ) {
 	// reuse BIOS status area
 
 #ifndef DEBUG_MODE
-	BootVideoClearScreen(&jpegBackdrop, nTempCursorY, VIDEO_CURSOR_POSY+1);  // blank out volatile data area
+//	BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
 #endif
 	VIDEO_CURSOR_POSX=nTempCursorX;
 	VIDEO_CURSOR_POSY=nTempCursorY;
+	VIDEO_CURSOR_POSX=0;
+	VIDEO_CURSOR_POSY=0;
 
 	BootIdeInit();
-	printk("\n");
+
+	printk("\n\n\n\n\n");
 
 	nTempCursorMbrX=VIDEO_CURSOR_POSX;
 	nTempCursorMbrY=VIDEO_CURSOR_POSY;
 
-	// if we made it this far, lets have a solid green LED to celebrate
-	setLED("gggg");
-
 //	printk("i2C=%d SMC=%d, IDE=%d, tick=%d una=%d unb=%d\n", nCountI2cinterrupts, nCountInterruptsSmc, nCountInterruptsIde, BIOS_TICK_COUNT, nCountUnusedInterrupts, nCountUnusedInterruptsPic2);
 	IconMenuInit();
+	inputLED();
 	IconMenu();
+
 	//Should never come back here.
 	while(1);  
 }
