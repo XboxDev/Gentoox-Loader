@@ -193,10 +193,21 @@ int eth_poll(void)
 	return ((*nic.poll)(&nic));
 }
 
+int eth_poll_into(char *buf, int *len)
+{
+   if (eth_poll()) {
+      *len = nic.packetlen;
+      memcpy (buf, nic.packet, nic.packetlen);
+      return 1;
+   }
+   return 0;
+}
+
+
 void eth_transmit(const char *d, unsigned int t, unsigned int s, const void *p)
 {
 	(*nic.transmit)(&nic, d, t, s, p);
-	if (t == IP) twiddle();
+//	if (t == IP) twiddle();
 }
 
 void eth_disable(void)
@@ -1249,7 +1260,7 @@ int decode_rfc1533(unsigned char *p, unsigned int block, unsigned int len, int e
 			unsigned char *q;
 			printf("Unknown RFC1533-tag ");
 			for(q=p;q<p+2+TAG_LEN(p);q++)
-				printf("%hhX ",*q);
+				//printf("%hhX ",*q);
 			putchar('\n');
 #endif
 		}
