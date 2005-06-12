@@ -37,6 +37,9 @@ ICON *selectedIcon=NULL;
 ICON *firstVisibleIcon=NULL;
 ICON *lastVisibleIcon=NULL;
 int timedOut=0;
+unsigned char *videosavepage;
+
+
 
 void AddIcon(ICON *newIcon) {
 	ICON *iconPtr = firstIcon;
@@ -128,12 +131,10 @@ static void IconMenuDraw(int nXOffset, int nYOffset) {
 }
 
 void IconMenu(void) {
-	unsigned char *videosavepage;
         
 	u32 COUNT_start;
 	u32 temp=1;
 	ICON *iconPtr=NULL;
-	int i;
 
 	extern int nTempCursorMbrX, nTempCursorMbrY; 
 	int nTempCursorResumeX, nTempCursorResumeY ;
@@ -153,16 +154,16 @@ void IconMenu(void) {
 	VIDEO_CURSOR_POSX=((252+nModeDependentOffset)<<2);
 	VIDEO_CURSOR_POSY=nTempCursorY-100;
 
-#ifndef SILENT_MODE
+//#ifndef SILENT_MODE
 	//In silent mode, don't draw the menu the first time.
 	//If we get a left/right xpad event, it will be registered,
 	//and the menu will 'appear'. Otherwise, it will proceed quietly
 	//and boot the default boot item
 	VIDEO_ATTR=0xffc8c8c8;
-	printk("Select from Menu\n");
+	//printk("Select from Menu\n");
 	VIDEO_ATTR=0xffffffff;
 	IconMenuDraw(nModeDependentOffset, nTempCursorY);
-#endif
+//#endif
 	COUNT_start = IoInputDword(0x8008);
 	//Main menu event loop.
 	while(1)
@@ -175,6 +176,7 @@ void IconMenu(void) {
 				//A bit ugly, but need to find the last visible icon, and see if 
 				//we are moving further right from it.
 				lastVisibleIcon=firstVisibleIcon;
+				int i=0;
 				for (i=0; i<2; i++) {
 					if (lastVisibleIcon->nextIcon==NULL) {
 						break;

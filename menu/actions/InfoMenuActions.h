@@ -1,3 +1,5 @@
+#ifndef _INFOMENUACTIONS_H_
+#define _INFOMENUACTIONS_H_
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -6,12 +8,11 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "boot.h"
-#include "BootIde.h"
-#include "video.h"
 
-void LockHdd(void *driveId);
+void ShowTemperature(void *);
+void ShowVideo(void *);
+void ShowEeprom(void *);
+void InfoHeader(char *title);
+void InfoFooter(void);
 
-void UnlockHdd(void *driveId);
-
-void DisplayHddPassword(void *driveId);
+#endif

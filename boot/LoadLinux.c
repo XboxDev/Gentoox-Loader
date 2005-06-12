@@ -21,6 +21,7 @@
 #include "BootParser.h"
 #include "config.h"
 #include "iso_fs.h"
+#include "Gentoox.h"
 
 //Grub bits
 unsigned long saved_drive;
@@ -41,12 +42,12 @@ void I2CRebootSlow(void);
 void BootPrintConfig(CONFIGENTRY *config) {
 	int CharsProcessed=0, CharsSinceNewline=0, Length=0;
 	char c;
-	printk("  Bootconfig : Kernel  %s \n", config->szKernel);
+	printk("           Bootconfig : Kernel  %s \n", config->szKernel);
 	VIDEO_ATTR=0xffa8a8a8;
 	if (strlen(config->szInitrd)!=0) {
-		printk("  Bootconfig : Initrd  %s \n", config->szInitrd);
+		printk("           Bootconfig : Initrd  %s \n", config->szInitrd);
 	}
-	printk("  Bootconfig : Kernel commandline :\n");
+	printk("           Bootconfig : Kernel commandline :\n");
 	Length=strlen(config->szAppend);
 	while (CharsProcessed<Length) {
 		c = config->szAppend[CharsProcessed];
@@ -74,6 +75,7 @@ void memPlaceKernel(const u8* kernelOrg, u32 kernelSize)
 
 
 CONFIGENTRY* LoadConfigNative(int drive, int partition) {
+	busyLED();
 	CONFIGENTRY *config;
 	CONFIGENTRY *currentConfigItem;
 	unsigned int nLen;
@@ -139,6 +141,12 @@ CONFIGENTRY* LoadConfigNative(int drive, int partition) {
 }
 
 int LoadKernelNative(CONFIGENTRY *config) {
+	busyLED();
+	VIDEO_CURSOR_POSY=vmode.ymargin+96;
+	printk("           Booting %s", config->title);
+	dots();
+	printk("\n\n");
+
 	char *szGrub;
 	u8* tempBuf;
 
@@ -165,42 +173,55 @@ int LoadKernelNative(CONFIGENTRY *config) {
 	disk_read_func=NULL;
 	
 	I2CTransmitWord(0x10, 0x0c01); // Close DVD tray
-	
-        strncpy(&szGrub[4], config->szKernel,strlen(config->szKernel));
+	printk("           Boot: Loading kernel '%s'", config->szKernel);
+	dots();
+
+	strncpy(&szGrub[4], config->szKernel,strlen(config->szKernel));
 
 	nRet=grub_open(szGrub);
 
 	if(nRet!=1) {
-		printk("Unable to load kernel, Grub error %d\n", errnum);
-		while(1) ;
+		//printk("           Unable to load kernel, Grub error %d\n", errnum);
+		cromwellError();
+		while(1);
 	}
-        
 	// Use INITRD_START as temporary location for loading the Kernel 
 	tempBuf = (u8*)INITRD_START;
 	dwKernelSize=grub_read(tempBuf, MAX_KERNEL_SIZE);
 	memPlaceKernel(tempBuf, dwKernelSize);
 	grub_close();
-	printk(" -  %d bytes...\n", dwKernelSize);
+	//printk(" -  %d bytes...\n", dwKernelSize);
+        cromwellSuccess();
 
 	if(strlen(config->szInitrd)!=0) {
 		VIDEO_ATTR=0xffd8d8d8;
-		printk("  Loading %s ", config->szInitrd);
+		printk("           Boot: Loading initrd '%s'", config->szInitrd);
+		dots();
+		printk("\t ");
+		//printk("  Loading %s ", config->szInitrd);
 		VIDEO_ATTR=0xffa8a8a8;
  		strncpy(&szGrub[4], config->szInitrd,sizeof(config->szInitrd));
 		nRet=grub_open(szGrub);
+
 		if(filemax==0) {
-			printf("Empty file\n"); while(1);
+			//printf("Empty file\n"); 
+			cromwellError();
+			while(1);
 		}
+
 		if( (nRet!=1) || (errnum)) {
-			printk("Unable to load initrd, Grub error %d\n", errnum);
-			while(1) ;
+			cromwellError();
+			//printk("Unable to load initrd, Grub error %d\n", errnum);
+			while(1);
 		}
-		printk(" - %d bytes\n", filemax);
+
+		//printk(" - %d bytes\n", filemax);
+		cromwellSuccess();
 		dwInitrdSize=grub_read((void*)INITRD_START, MAX_INITRD_SIZE);
 		grub_close();
 	} else {
 		VIDEO_ATTR=0xffd8d8d8;
-		printk("  No initrd from config file");
+		//printk("  No initrd from config file");
 		VIDEO_ATTR=0xffa8a8a8;
 		dwInitrdSize=0;
 	}
@@ -209,6 +230,7 @@ int LoadKernelNative(CONFIGENTRY *config) {
 }
 
 CONFIGENTRY* LoadConfigFatX(void) {
+	busyLED();
 	FATXPartition *partition = NULL;
 	FATXFILEINFO fileinfo;
 	CONFIGENTRY *config=NULL, *currentConfigItem=NULL;
@@ -240,7 +262,7 @@ CONFIGENTRY* LoadConfigFatX(void) {
 }
 
 int LoadKernelFatX(CONFIGENTRY *config) {
-
+	busyLED();
 	static FATXPartition *partition = NULL;
 	static FATXFILEINFO fileinfo;
 	static FATXFILEINFO infokernel;
@@ -254,6 +276,11 @@ int LoadKernelFatX(CONFIGENTRY *config) {
 
 	I2CTransmitWord(0x10, 0x0c01); // Close DVD tray
 	
+	VIDEO_CURSOR_POSY=vmode.ymargin+96;
+	printk("           Booting %s", config->title);
+	dots();
+	printk("\n\n");
+
 	partition = OpenFATXPartition(0,
 			SECTOR_STORE,
 			STORE_SIZE);
@@ -262,40 +289,45 @@ int LoadKernelFatX(CONFIGENTRY *config) {
 
 	// Use INITRD_START as temporary location for loading the Kernel 
 	tempBuf = (u8*)INITRD_START;
+	printk("           Boot: Loading kernel '%s'", config->szKernel);
+	dots();
 	if(! LoadFATXFilefixed(partition,config->szKernel,&infokernel,tempBuf)) {
-		printk("Error loading kernel %s\n",config->szKernel);
+		//printk("Error loading kernel %s\n",config->szKernel);
+		cromwellError();
 		while(1);
 	} else {
 		dwKernelSize = infokernel.fileSize;
 		// moving the kernel to its final location
 		memPlaceKernel(tempBuf, dwKernelSize);
-		
-		printk(" -  %d bytes...\n", infokernel.fileRead);
+		cromwellSuccess();
+		//printk(" -  %d bytes...\n", infokernel.fileRead);
 	}
 
 	if(strlen(config->szInitrd)!=0) {
 		VIDEO_ATTR=0xffd8d8d8;
-		printk("  Loading %s from FATX", config->szInitrd);
+		printk("           Boot: Loading initrd '%s'", config->szInitrd);
+		dots();
+		printk("\t ");
 		wait_ms(50);
+
 		if(! LoadFATXFilefixed(partition,config->szInitrd,&infoinitrd, (void*)INITRD_START)) {
-			printk("Error loading initrd %s\n",config->szInitrd);
+			cromwellError();
 			while(1);
 		}
-		
 		dwInitrdSize = infoinitrd.fileSize;
-		printk(" - %d %d bytes\n", dwInitrdSize,infoinitrd.fileRead);
+		cromwellSuccess();
+		//printk(" - %d %d bytes\n", dwInitrdSize,infoinitrd.fileRead);
 	} else {
-		VIDEO_ATTR=0xffd8d8d8;
-		printk("  No initrd from config file");
-		VIDEO_ATTR=0xffa8a8a8;
+		cromwellError();
 		dwInitrdSize=0;
-		printk("");
+		while(1);
 	}
 	return true;
 }
 
 
 CONFIGENTRY *LoadConfigCD(int cdromId) {
+	busyLED();
 	long dwConfigSize=0;
 	int n;
 	int configLoaded=0;
@@ -303,11 +335,15 @@ CONFIGENTRY *LoadConfigCD(int cdromId) {
 
 	memset((u8 *)KERNEL_SETUP,0,4096);
 
-	printk("\2Please wait\n\n");
 	//See if we already have a CDROM in the drive
-	//Try for 8 seconds - takes a while to 'spin up'.
+	//Try for 4 seconds - takes a while to 'spin up'.
 	I2CTransmitWord(0x10, 0x0c01); // close DVD tray
-	for (n=0;n<32;++n) {
+
+	VIDEO_CURSOR_POSY=vmode.ymargin+96;
+	printk("           Checking disc");
+	dots();
+
+	for (n=0;n<16;++n) {
 		dwConfigSize = BootIso9660GetFile(cdromId,"/linuxboo.cfg", (u8 *)KERNEL_SETUP, 0x800);
 		if (dwConfigSize>0) {
 			configLoaded=1;
@@ -316,39 +352,42 @@ CONFIGENTRY *LoadConfigCD(int cdromId) {
 		wait_ms(250);
 	}
 
-	//We couldn't read the disk, so we eject the drive so the user can insert one.
 	if (!configLoaded) {
+		cromwellWarning();
 		//Needs to be changed for non-xbox drives, which don't have an eject line
 		//Need to send ATA eject command.
 		I2CTransmitWord(0x10, 0x0c00); // eject DVD tray
-		wait_ms(2000); // Wait for DVD to become responsive to inject command
-			
 		VIDEO_ATTR=0xffeeeeff;
-		printk("\2Please insert CD and press Button A\n\n");
+		printk("           Please insert a boot disc and close the DVD tray");
+		dots();
+
+		wait_ms(1000); // Wait for DVD to become responsive to inject command
 
 		while(1) {
 			// Make button 'A' close the DVD tray
 			if (risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) == 1) {
 				I2CTransmitWord(0x10, 0x0c01);
+				// May as well break here too incase the drive is
+				// a non-standard Xbox drive and can't report whether the
+				// tray is closing or not.
 				wait_ms(500);
 				break;
 			}
-			else if (DVD_TRAY_STATE == DVD_CLOSING) {
-				//It's an xbox drive, and somebody pushed the tray in manually
+
+			// If the drive is closing, exit the loop.  This accounts
+			// for people pushing the drive shut or even pressing the eject
+			// button.
+			if (DVD_TRAY_STATE == DVD_CLOSING) {
 				wait_ms(500);
-				break;
-			}
-			else if (BootIso9660GetFile(cdromId,"/linuxboo.cfg", (u8 *)KERNEL_SETUP, 0x800)>0) {
-				//It isnt an xbox drive, and somebody pushed the tray in manually, and 
-				//the cd is valid.
 				break;
 			}
 			wait_ms(10);
 		}						
 
-		VIDEO_ATTR=0xffffffff;
+		busyLED();
 
-		printk("Loading linuxboot.cfg from CDROM... \n");
+		VIDEO_ATTR=0xffffffff;
+		//printk("Loading linuxboot.cfg from CDROM... \n");
 		//Try to load linuxboot.cfg - if we can't after a while, give up.
 		for (n=0;n<48;++n) {
 			dwConfigSize = BootIso9660GetFile(cdromId,"/linuxboo.cfg", (u8 *)KERNEL_SETUP, 0x800);
@@ -361,7 +400,15 @@ CONFIGENTRY *LoadConfigCD(int cdromId) {
 	}
 
 	//Failed to load the config file
-	if (!configLoaded) return NULL;
+	if (!configLoaded) {
+		cromwellError();
+		return NULL;
+	}
+
+	cromwellSuccess();
+	printk("           Booting CD");
+	dots();
+	printk("\n\n");
         
 	// LinuxBoot.cfg File Loaded
 	config = ParseConfig((char *)KERNEL_SETUP, dwConfigSize, NULL);
@@ -372,41 +419,45 @@ CONFIGENTRY *LoadConfigCD(int cdromId) {
 		currentConfigItem->bootType=BOOT_CDROM;
 	}
 	
+	strcpy(config->title,"CD/DVD");
 	return config;
 }
 
 int LoadKernelCdrom(CONFIGENTRY *config) {
+	busyLED();
 	u8* tempBuf;
 	
 	// Use INITRD_START as temporary location for loading the Kernel 
 	tempBuf = (u8*)INITRD_START;
+	printk("           Boot: Loading kernel '%s'", config->szKernel);
+	dots();
 	dwKernelSize=BootIso9660GetFile(config->drive,config->szKernel, tempBuf, MAX_KERNEL_SIZE);
 
 	if( dwKernelSize < 0 ) {
-		printk("Not Found, error %d\nHalting\n", dwKernelSize); 
+		cromwellError();
 		while(1);
 	} else {
 		memPlaceKernel(tempBuf, dwKernelSize);
-		printk(" -  %d bytes...\n", dwKernelSize);
+		cromwellSuccess();
 	}
 
 	if(strlen(config->szInitrd)!=0) {
 		VIDEO_ATTR=0xffd8d8d8;
-		printk("  Loading %s from CDROM", config->szInitrd);
+		printk("           Boot: Loading initrd '%s'", config->szInitrd);	
+		dots();
+		printk("\t ");
 		VIDEO_ATTR=0xffa8a8a8;
 		
 		dwInitrdSize=BootIso9660GetFile(config->drive, config->szInitrd, (void*)INITRD_START, MAX_INITRD_SIZE);
 		if( dwInitrdSize < 0 ) {
-			printk("Not Found, error %d\nHalting\n", dwInitrdSize); 
+			cromwellError();
 			while(1);
 		}
-		printk(" - %d bytes\n", dwInitrdSize);
+		cromwellSuccess();
 	} else {
-		VIDEO_ATTR=0xffd8d8d8;
-		printk("  No initrd from config file");
-		VIDEO_ATTR=0xffa8a8a8;
+		cromwellError();
 		dwInitrdSize=0;
-		printk("");
+		while(1);
 	}
 	return true;
 }
@@ -414,10 +465,10 @@ int LoadKernelCdrom(CONFIGENTRY *config) {
 
 #ifdef FLASH 
 int BootLoadFlashCD(int cdromId) {
-	
-	u32 dwConfigSize=0;
+	busyLED();
+	long imageSize=0;
 	int n;
-	int cdPresent=0;
+	int imageFound=0;
 	struct SHA1Context context;
 	unsigned char SHA1_result[20];
 	unsigned char checksum[20];
@@ -425,93 +476,142 @@ int BootLoadFlashCD(int cdromId) {
 	memset((u8 *)KERNEL_SETUP,0,4096);
 
 	//See if we already have a CDROM in the drive
-	//Try for 4 seconds.
+	//Try for 4 seconds - takes a while to 'spin up'.
 	I2CTransmitWord(0x10, 0x0c01); // close DVD tray
+
+	VIDEO_CURSOR_POSY=vmode.ymargin+96;
+	printk("           Checking disc");
+	dots();
+
 	for (n=0;n<16;++n) {
-		if((BootIso9660GetFile(cdromId,"/image.bin", (u8 *)KERNEL_PM_CODE, 0x10)) >=0 ) {
-			cdPresent=1;
+		imageSize = BootIso9660GetFile(cdromId,"/image.bin", (u8 *)KERNEL_PM_CODE, 0x10);
+		if (imageSize>0) {
+			imageFound=1;
 			break;
 		}
 		wait_ms(250);
 	}
 
-	if (!cdPresent) {
+	if (!imageFound) {
 		//Needs to be changed for non-xbox drives, which don't have an eject line
 		//Need to send ATA eject command.
 		I2CTransmitWord(0x10, 0x0c00); // eject DVD tray
-		wait_ms(2000); // Wait for DVD to become responsive to inject command
-			
+		cromwellWarning();
 		VIDEO_ATTR=0xffeeeeff;
-		
-		printk("Please insert CD with image.bin file on, and press Button A\n");
+		printk("           Please insert a disc which contains \"image.bin\"");
+		dots();
+		inputLED();
+
+		wait_ms(1000); // Wait for DVD to become responsive to inject command
 
 		while(1) {
+			// Make button 'A' close the DVD tray
 			if (risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) == 1) {
-				I2CTransmitWord(0x10, 0x0c01); // close DVD tray
+				I2CTransmitWord(0x10, 0x0c01);
+				// May as well break here too incase the drive is
+				// a non-standard Xbox drive and can't report whether the
+				// tray is closing or not.
+				wait_ms(500);
+				busyLED();
+				break;
+			}
+
+			// If the drive is closing, exit the loop.  This accounts
+			// for people pushing the drive shut or even pressing the eject
+			// button.
+			if (DVD_TRAY_STATE == DVD_CLOSING) {
 				wait_ms(500);
 				break;
 			}
-        	        USBGetEvents();
 			wait_ms(10);
 		}						
 
+		busyLED();
+
 		VIDEO_ATTR=0xffffffff;
 
-		// wait until the media is readable
-		while(1) {
-			if((BootIso9660GetFile(cdromId,"/image.bin", (u8 *)KERNEL_PM_CODE, 0x10)) >=0 ) {
+		//Try to load image.bin - if we can't after a while, give up.
+		for (n=0;n<48;++n) {
+			imageSize = BootIso9660GetFile(cdromId,"/image.bin", (u8 *)KERNEL_PM_CODE, 0x10);
+			if (imageSize>0) {
+				imageFound=1;
 				break;
 			}
-			wait_ms(200);
+			wait_ms(250);
 		}
 	}
-	printk("CDROM: ");
-	printk("Loading bios image from CDROM:/image.bin. \n");
-	dwConfigSize=BootIso9660GetFile(cdromId, "/image.bin", (u8 *)KERNEL_PM_CODE, 	256*1024);
-	
-	if( dwConfigSize < 0 ) { //It's not there
-		printk("image.bin not found on CDROM... Halting\n");
-		while(1) ;
+
+	//Failed to find the image.bin file
+	if (!imageFound) {
+		cromwellError();
+		printk("\n\n           Could not find the image.bin file.\n");
+		wait_ms(2000);
+		inputLED();
+		return 0;
 	}
 
-	printk("Image size: %i\n", dwConfigSize);
-        if (dwConfigSize!=256*1024) {
-		printk("Image is not a 256kB image - aborted\n");
-		while (1);
-	}
-	SHA1Reset(&context);
-	SHA1Input(&context,(u8 *)KERNEL_PM_CODE,dwConfigSize);
-	SHA1Result(&context,SHA1_result);
-	memcpy(checksum,SHA1_result,20);
-	printk("Result code: %d\n", BootReflashAndReset((u8*) KERNEL_PM_CODE, (u32) 0, (u32) dwConfigSize));
-	SHA1Reset(&context);
-	SHA1Input(&context,(void *)LPCFlashadress,dwConfigSize);
-	SHA1Result(&context,SHA1_result);
-	if (memcmp(checksum,SHA1_result,20)==0) {
-		printk("Checksum in flash matches - Flash successful.\nRebooting.");
+	cromwellSuccess();
+
+	printk("           Reading image.bin");
+	dots();
+
+	// Read in a full 1MB bios (read will be truncated if the file is not this big).
+	imageSize=BootIso9660GetFile(cdromId, "/image.bin", (u8 *)KERNEL_PM_CODE, 4*256*1024);
+	
+	if(imageSize < 0) { //It's not there
+		cromwellWarning();
+		printk("           image.bin not found on CD.\n");
 		wait_ms(2000);
-		I2CRebootSlow();	
-	} else {
-		printk("Checksum in Flash not matching - MISTAKE - Reflashing!\n");
-		printk("Result code: %d\n", BootReflashAndReset((u8*) KERNEL_PM_CODE, (u32) 0, (u32) dwConfigSize));
+		inputLED();
+		return 0;
 	}
+
+	if((imageSize > 0) && (imageSize <= 4*256*1024) && (imageSize%256 == 0)) {
+		SHA1Reset(&context);
+		SHA1Input(&context,(u8 *)KERNEL_PM_CODE,imageSize);
+		SHA1Result(&context,SHA1_result);
+		memcpy(checksum,SHA1_result,20);
+		ClearScreen();
+		BootReflashAndReset((u8*) KERNEL_PM_CODE, (u32) 0, (u32) imageSize);
+		SHA1Reset(&context);
+		SHA1Input(&context,(void *)LPCFlashadress,imageSize);
+		SHA1Result(&context,SHA1_result);
+		if (memcmp(checksum,SHA1_result,20)==0) {
+			//printk("Checksum in flash matches - Flash successful.\nRebooting.");
+			wait_ms(2000);
+			I2CRebootSlow();	
+		} else {
+			//printk("Checksum in Flash not matching - MISTAKE - Reflashing!\n");
+			//printk("Result code: %d\n", BootReflashAndReset((u8*) KERNEL_PM_CODE, (u32) 0, (u32) imageSize));
+		}
+	} else {
+		cromwellWarning();
+		printk("           Image size is not divisible by 256.");
+		printk("           (e.g. 256K, 512K, 768K, 1024K...");
+		wait_ms(2000);
+		inputLED();
+		return 0;
+	}
+	// Should never get here.
+	wait_ms(2000);
+	inputLED();
 	return 0;
 }
 #endif //Flash
 
 
 void ExittoLinux(CONFIGENTRY *config) {
+	busyLED();
 	VIDEO_ATTR=0xff8888a8;
-	BootPrintConfig(config);
-	printk("     Kernel:  %s\n", (char *)(0x00090200+(*((u16 *)0x9020e)) ));
-	printk("\n");
+	//BootPrintConfig(config);
+	//printk("     Kernel:  %s\n", (char *)(0x00090200+(*((u16 *)0x9020e)) ));
+	//printk("\n");
 	{
-		char *sz="\2Starting Linux\2";
+		char *sz="\2Starting titlehere\2";
 		VIDEO_CURSOR_POSX=((vmode.width-BootVideoGetStringTotalWidth(sz))/2)*4;
 		VIDEO_CURSOR_POSY=vmode.height-64;
-
-		VIDEO_ATTR=0xff9f9fbf;
-		printk(sz);
+		VIDEO_ATTR=0xff00ff00;
+		printk("\2Starting %s\2", config->title);
 	}
 	setLED("rrrr");
 	startLinux((void*)INITRD_START, dwInitrdSize, config->szAppend);
@@ -538,10 +638,9 @@ void startLinux(void* initrdStart, unsigned long initrdSize, const char* appendL
 	// nAta=1;
 	BootIdeSetTransferMode(0, 0x40 | nAta);
 	BootIdeSetTransferMode(1, 0x40 | nAta);
-
-	// orange, people seem to like that colour
-	setLED("oooo");
 	         
+	goodLED();
+
 	// Set framebuffer address to final location (for vesafb driver)
 	(*(unsigned int*)0xFD600800) = (0xf0000000 | ((xbox_ram*0x100000) - FB_SIZE));
 	
