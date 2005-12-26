@@ -37,26 +37,37 @@ unsigned long virt_offset = 0;
 
 struct pci_driver* pci_drivers = &forcedeth_driver;
 struct pci_driver* pci_drivers_end = &forcedeth_driver + 1;
+struct dev* dev = &nic.dev;
+
+int initialiseNetwork(void)
+{
+	//print_config();
+	if (eth_probe(dev) == -1)
+	{
+		//printk("eth_probe failed\n");
+	}
+}
 
 int etherboot(void)
 {
-	struct dev* dev = &nic.dev;
-	print_config();
-	if (eth_probe(dev) == -1)
+	if (eth_load_configuration(dev) != 0)
 	{
-		printk("eth_probe failed\n");
+		printk("eth_load_configuration failed\n");
 	}
-	else 
+	else
 	{
-		if (eth_load_configuration(dev) != 0)
-		{
-			printk("eth_load_configuration failed\n");
-		}
-		else
-		{
-			eth_load(dev);
-		}
+		eth_load(dev);
 	}
+}
+
+int netflash(void) {
+	extern int run_lwip(int A, int B, int C, int D, int P);
+	run_lwip(-1, -1, -1, -1, -1);
+}
+
+int netBoot(int A, int B, int C, int D, int P) {
+	extern int run_lwip(int A, int B, int C, int D, int P);
+	run_lwip(A, B, C, D, P);
 }
 
 int pcibios_read_config_byte(unsigned int bus, unsigned int device_fn, unsigned int where, uint8_t *value)
@@ -237,7 +248,7 @@ void xstart16 (unsigned long a, unsigned long b, char * c)
 	restart_etherboot(-1);
 }
 
-extern void startLinux(void* initrdPos, unsigned long initrdSize, const char* appendLine, unsigned int entry);
+extern void startLinux(void* initrdPos, unsigned long initrdSize, const char* appendLine);
 
 int xstart32(unsigned long entry_point, ...)
 {
@@ -315,7 +326,7 @@ int xstart32(unsigned long entry_point, ...)
 			*appendLinePtr= '\0';
 		}
 		printf("Using cmdline: %s\n", appendLine);
-		startLinux((void*)INITRD_START, initrdSize, appendLine, entry_point);
+		startLinux((void*)INITRD_START, initrdSize, appendLine);
 	}
 	else
 	{

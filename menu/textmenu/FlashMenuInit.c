@@ -17,21 +17,38 @@ TEXTMENU* FlashMenuInit(void) {
 	TEXTMENU *menuPtr;
 	int i=0;
 
-	menuPtr = malloc(sizeof(TEXTMENU));
+	menuPtr = (TEXTMENU*)malloc(sizeof(TEXTMENU));
 	memset(menuPtr,0x00,sizeof(TEXTMENU));
 	strcpy(menuPtr->szCaption, "Flash Menu");
 	
 	for (i=0; i<2; ++i) {
 		if (tsaHarddiskInfo[i].m_fDriveExists && tsaHarddiskInfo[i].m_fAtapi) {
-			char *driveName=malloc(sizeof(char)*32);
-			itemPtr = malloc(sizeof(TEXTMENUITEM));
+ 			char *driveName=malloc(sizeof(char)*32);
+			itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 			memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-			sprintf(itemPtr->szCaption,"Flash bios from CD-ROM (hd%c)",i ? 'b':'a');
+			sprintf(itemPtr->szCaption,"CD Flash (image.bin)");// (hd%c)",i ? 'b':'a');
 			itemPtr->functionPtr= FlashBiosFromCD;
-			itemPtr->functionDataPtr = malloc(sizeof(int));
+    		itemPtr->functionDataPtr = malloc(sizeof(int));
 			*(int*)itemPtr->functionDataPtr = i;
 			TextMenuAddItem(menuPtr, itemPtr);
 		}
 	}
+
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+   sprintf(itemPtr->szCaption,"HDD Flash");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)HDDFlashMenuInit();
+	TextMenuAddItem(menuPtr, itemPtr);
+
+#ifdef LWIP
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+   sprintf(itemPtr->szCaption,"Net Flash");
+	itemPtr->functionPtr= enableHttpd;
+	itemPtr->functionDataPtr= NULL;
+	TextMenuAddItem(menuPtr, itemPtr);
+#endif
+
 	return menuPtr;
 }
