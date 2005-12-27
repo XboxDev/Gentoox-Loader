@@ -13,17 +13,17 @@
 #include "VideoInitialization.h"
 #include "BootEEPROM.h"
 
-void SetWidescreen(void *menuItemText) {
-	char *text = (char *)menuItemText;
-	if (!strcmp(text, "Display Size: Widescreen")) {
-		strcpy(text, "Display Size: Normal");
-		EepromSetWidescreen(0);	
-	}
-	else if (!strcmp(text, "Display Size: Normal")) {
-		strcpy(text, "Display Size: Widescreen");
-		EepromSetWidescreen(1);	
-	}
-}
+//void SetWidescreen(void *menuItemText) {
+//	char *text = (char *)menuItemText;
+//	if (!strcmp(text, "Display Size: Widescreen")) {
+//		strcpy(text, "Display Size: Normal");
+//		EepromSetWidescreen(0);	
+//	}
+//	else if (!strcmp(text, "Display Size: Normal")) {
+//		strcpy(text, "Display Size: Widescreen");
+//		EepromSetWidescreen(1);	
+//	}
+//}
 
 void SetVideoStandard(void *menuItemText) {
 	char *text = (char *)menuItemText;
@@ -40,7 +40,7 @@ void SetVideoStandard(void *menuItemText) {
 		strcpy(text, "TV Standard: PAL");
 		EepromSetVideoStandard(PAL_I);
 	}
-	// We want people with broken EEPROMs to be able to recover!
+	// By default, make Unknown cycle back to PAL_I.
 	else if (!strcmp(text, "TV Standard: Unknown")) {
 		strcpy(text, "TV Standard: PAL");
 		EepromSetVideoStandard(PAL_I);
