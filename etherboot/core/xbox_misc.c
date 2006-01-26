@@ -186,7 +186,7 @@ int strcasecmp(const char *a, const char *b)
 /**************************************************************************
 INET_ATON - Convert an ascii x.x.x.x to binary form
 **************************************************************************/
-int inet_aton(const char *start, in_addr *i)
+/*int inet_aton(const char *start, in_addr *i)
 {
 	const char *p = start;
 	const char *digits_start;
@@ -203,7 +203,7 @@ int inet_aton(const char *start, in_addr *i)
 	i->s_addr = htonl(ip);
 	return p - start;
 }
-
+*/
 
 unsigned long strtoul(const char *p, const char **endp, int base)
 {

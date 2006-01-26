@@ -90,12 +90,7 @@ int I2CTransmitWord(u8 bPicAddressI2cFormat, u16 wDataToWrite)
 // given four bytes, returns a u16
 // LSB of return is the 'first' byte, MSB is the 'second' response byte
 
-u16 BootPicManipulation(
-	u8 bC,
-	u8  bD,
-	u8  bE,
-	u8  bF
-) {
+u16 BootPicManipulation(u8 bC, u8 bD, u8 bE,	u8 bF) {
 	int n=4;
 	u8
 		b1 = 0x33,
