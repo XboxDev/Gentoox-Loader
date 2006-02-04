@@ -33,13 +33,24 @@ void BootFromCD(void *data) {
 	int nTempCursorY = VIDEO_CURSOR_POSY; 
 	CONFIGENTRY *config = LoadConfigCD(*(int*)data);
 	if (config==NULL) {
-		printk("Boot from CD failed.\nCheck that linuxboot.cfg exists.\n");
-		wait_ms(2000);
+		errorLED();
+		printk("\n\n           Could not boot from disc!\n           Try different media and a lower burning speed.\n");
+		wait_ms(5000);
+		inputLED();
 		//Clear the screen and return to the menu
 		BootVideoClearScreen(&jpegBackdrop, nTempCursorY, VIDEO_CURSOR_POSY+1);	
 		return;
 	}
 	DrawBootMenu(config);
+}
+
+void BootFromNet(void *whatever) {
+   extern unsigned char *videosavepage;
+   memcpy((void*)FB_START,videosavepage,FB_SIZE);
+   VIDEO_ATTR=0xffef37;
+   VIDEO_ATTR=0xffc8c8c8;
+   initialiseNetwork();
+   netBoot();
 }
 
 void DrawBootMenu(void *rootEntry) {
@@ -80,12 +91,13 @@ void DrawBootMenu(void *rootEntry) {
 	for (currentConfigEntry = configEntry; currentConfigEntry != NULL; 
 		currentConfigEntry = currentConfigEntry->nextConfigEntry) {
 	
-		menuPtr = malloc(sizeof(TEXTMENUITEM*));
+		menuPtr = (TEXTMENUITEM *)malloc(sizeof(TEXTMENUITEM*));
 		memset(menuPtr, 0x00, sizeof(menuPtr));
 		if (currentConfigEntry->title == NULL) {
 			strcpy(menuPtr->szCaption,"Untitled");
+		} else { 
+			strncpy(menuPtr->szCaption,currentConfigEntry->title,50);
 		}
-		else strncpy(menuPtr->szCaption,currentConfigEntry->title,50);
 		menuPtr->functionPtr = BootMenuEntry;
 		menuPtr->functionDataPtr = (void *)currentConfigEntry;
 		//If this config entry is default, mark the menu item as default.
@@ -97,6 +109,11 @@ void DrawBootMenu(void *rootEntry) {
 
 void BootMenuEntry(void *entry) {
 	CONFIGENTRY *config = (CONFIGENTRY*)entry;
+	if (!(config->nextConfigEntry==NULL) || !(config->previousConfigEntry==NULL)) {
+		extern unsigned char *videosavepage;
+		memcpy((void*)FB_START,videosavepage,FB_SIZE);
+	}
+
 	switch (config->bootType) {
 		case BOOT_CDROM:
 			LoadKernelCdrom(config);
@@ -118,6 +135,8 @@ void DrawChildTextMenu(void *menu) {
 #ifdef ETHERBOOT 
 extern int etherboot(void);
 void BootFromEtherboot(void *data) {
+	busyLED();
+	initialiseNetwork();
 	etherboot();
 }
 #endif
