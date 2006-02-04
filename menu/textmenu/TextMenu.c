@@ -9,6 +9,10 @@
 
 #include "TextMenu.h"
 int breakOutOfMenu=0;
+u32 temp, oldTemp; 
+int timeRemain = 0;
+int oldTimeRemain = 0;
+int visibleCount = 0;
 
 void TextMenuDraw(TEXTMENU *menu, TEXTMENUITEM *firstVisibleMenuItem, TEXTMENUITEM *selectedItem);
 
@@ -40,7 +44,33 @@ void TextMenuDraw(TEXTMENU* menu, TEXTMENUITEM *firstVisibleMenuItem, TEXTMENUIT
 	
 	//Draw the menu title.
 	VIDEO_ATTR=0xff00ff;
-	printk("\2          %s\n",menu->szCaption);
+	if(menu->longTitle) {
+		int Length=strlen(menu->szCaption);
+		int CharsProcessed = 0;
+		char c;
+		int CharsSinceNewline = 0;
+		printk("\2          \2");
+		while (CharsProcessed<Length) {
+			c = menu->szCaption[CharsProcessed];
+			CharsProcessed++;
+			CharsSinceNewline++;
+			if(CharsSinceNewline >= 21) {
+				printk("\2\n\n\2");
+				VIDEO_CURSOR_POSX=75;
+				printk("\2          \2");
+				CharsSinceNewline = 1;
+			}
+			printk("\2%c\2",c);
+		}
+	} else {
+		printk("\2          %s\2", menu->szCaption);
+	}
+	
+	if(temp != 0) {
+		// If we have a timeout running...
+		printk("  (%i)\2", timeRemain);
+	}
+
 	VIDEO_CURSOR_POSY+=30;
 	
 	//Draw the menu items
@@ -49,7 +79,14 @@ void TextMenuDraw(TEXTMENU* menu, TEXTMENUITEM *firstVisibleMenuItem, TEXTMENUIT
 	//If we were moving up, the 
 	
 	item=firstVisibleMenuItem;
-	for (menucount=0; menucount<8; menucount++) {
+
+	visibleCount = menu->visibleCount;
+
+	if(visibleCount == 0) {
+		visibleCount = 8;
+	}
+
+	for (menucount=0; menucount<visibleCount; menucount++) {
 		if (item==NULL) {
 			//No more menu items to draw
 			return;
@@ -65,6 +102,10 @@ void TextMenuDraw(TEXTMENU* menu, TEXTMENUITEM *firstVisibleMenuItem, TEXTMENUIT
 }
 
 void TextMenu(TEXTMENU *menu, TEXTMENUITEM *selectedItem) {
+	temp = menu->timeout;
+	u32 COUNT_start;
+	COUNT_start = IoInputDword(0x8008);
+
 	TEXTMENUITEM *itemPtr, *selectedMenuItem, *firstVisibleMenuItem;
 	BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
 	
@@ -78,10 +119,16 @@ void TextMenu(TEXTMENU *menu, TEXTMENUITEM *selectedItem) {
 	while(1)
 	{
 		int changed=0;
-		wait_ms(75);
+		wait_ms(10);
 
 		if (risefall_xpad_BUTTON(TRIGGER_XPAD_PAD_UP) == 1)
 		{
+			oldTemp = temp;
+			temp = 0;
+			if(oldTemp != 0) {
+					BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
+			}
+
 			if (selectedMenuItem->previousMenuItem!=NULL) {
 				if (firstVisibleMenuItem == selectedMenuItem) {
 					firstVisibleMenuItem = selectedMenuItem->previousMenuItem;
@@ -92,11 +139,17 @@ void TextMenu(TEXTMENU *menu, TEXTMENUITEM *selectedItem) {
 			}
 		} 
 		else if (risefall_xpad_BUTTON(TRIGGER_XPAD_PAD_DOWN) == 1) {
+			oldTemp = temp;
+			temp = 0;
+			if(oldTemp != 0) {
+					BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
+			}
+
 			int i=0;
 			if (selectedMenuItem->nextMenuItem!=NULL) {
 				TEXTMENUITEM *lastVisibleMenuItem = firstVisibleMenuItem;
 				//8 menu items per page.
-				for (i=0; i<7; i++) {
+				for (i=0; i<visibleCount-1; i++) {
 					if (lastVisibleMenuItem->nextMenuItem==NULL) break;
 					lastVisibleMenuItem = lastVisibleMenuItem->nextMenuItem;
 				}
@@ -108,7 +161,8 @@ void TextMenu(TEXTMENU *menu, TEXTMENUITEM *selectedItem) {
 				TextMenuDraw(menu, firstVisibleMenuItem, selectedMenuItem);
 			}
 		}
-		else if (risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) == 1 || risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_START) == 1) {
+		else if (risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) == 1 || risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_START) == 1 || (u32)temp>(0x369E99*MENU_TIMEWAIT)) {
+			temp = 0;
 			BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
 			VIDEO_ATTR=0xffffff;
 			//Menu item selected - invoke function pointer.
@@ -124,10 +178,67 @@ void TextMenu(TEXTMENU *menu, TEXTMENUITEM *selectedItem) {
 			//We need to redraw ourselves
 			TextMenuDraw(menu, firstVisibleMenuItem, selectedMenuItem);
 		}
+		else if (risefall_xpad_BUTTON(TRIGGER_XPAD_PAD_LEFT) == 1) {
+			oldTemp = temp;
+			temp = 0;
+			if(oldTemp != 0) {
+					BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
+			}
+
+			VIDEO_ATTR=0xffffff;
+			//Menu item selected - invoke function pointer.
+			if (selectedMenuItem->functionLeftPtr!=NULL) {
+				selectedMenuItem->functionLeftPtr(selectedMenuItem->functionLeftDataPtr);
+				//Clear the screen again	
+				BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
+				VIDEO_ATTR=0xffffff;
+				//Did the function that was run set the 'Quit the menu' flag?
+				if (breakOutOfMenu) {
+					breakOutOfMenu=0;
+					return;
+				}
+			}
+			//We need to redraw ourselves
+			TextMenuDraw(menu, firstVisibleMenuItem, selectedMenuItem);
+		}
+		else if (risefall_xpad_BUTTON(TRIGGER_XPAD_PAD_RIGHT) == 1) {
+			oldTemp = temp;
+			temp = 0;
+			if(oldTemp != 0) {
+					BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
+			}
+
+			VIDEO_ATTR=0xffffff;
+			//Menu item selected - invoke function pointer.
+			if (selectedMenuItem->functionRightPtr!=NULL) {
+				selectedMenuItem->functionRightPtr(selectedMenuItem->functionRightDataPtr);
+				//Clear the screen again	
+				BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
+				VIDEO_ATTR=0xffffff;
+				//Did the function that was run set the 'Quit the menu' flag?
+				if (breakOutOfMenu) {
+					breakOutOfMenu=0;
+					return;
+				}
+			}
+			//We need to redraw ourselves
+			TextMenuDraw(menu, firstVisibleMenuItem, selectedMenuItem);
+		}
 		else if (risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_B) == 1 || risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_BACK) == 1) {
 			BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
 			VIDEO_ATTR=0xffffff;
+			temp = 0;
 			return;
+		}
+
+		if (temp != 0) {
+			temp = IoInputDword(0x8008) - COUNT_start;
+			oldTimeRemain = timeRemain;
+			timeRemain = MENU_TIMEWAIT - temp/0x369E99;
+			if (oldTimeRemain != timeRemain) {
+				BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
+				TextMenuDraw(menu, firstVisibleMenuItem, selectedMenuItem);
+			}
 		}
 	}
 }
