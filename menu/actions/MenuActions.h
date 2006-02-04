@@ -25,6 +25,7 @@ void BootMenuEntry(void *entry);
 
 //Ick, this needs to be removed.
 void BootFromCD(void *driveId);
+void BootFromNet(void *whatever);
 
 #ifdef FLASH
 void FlashBios(void *);
