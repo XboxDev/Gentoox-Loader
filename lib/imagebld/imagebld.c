@@ -76,7 +76,7 @@ void writeBiosIdentifier(unsigned char *cromimage, int biosSize) {
 	memcpy(BiosHeader->Magic,"AUTO",4);
 	BiosHeader->HeaderVersion=1;
 	BiosHeader->BiosSize= biosSize;
-	sprintf(BiosHeader->Name,"Cromwell %s",VERSION);
+	sprintf(BiosHeader->Name,"Gentoox Loader %s",VERSION);
 						               
 	BiosHeader->XboxVersion =       BiosID_Version10 |
 	                                BiosID_Version11 |
@@ -94,8 +94,8 @@ void writeBiosIdentifier(unsigned char *cromimage, int biosSize) {
 	MD5Final(BiosHeader->MD5Hash, &hashcontext);      
 }
 
-int xberepair ( const char * xbeimage,
-		const char * cromimage
+int xberepair (	unsigned char * xbeimage,
+		unsigned char * cromimage
 		)
 {
 	FILE *f;
@@ -205,8 +205,8 @@ int xberepair ( const char * xbeimage,
 }
 
 
-int vmlbuild (	const char * vmlimage,
-		const char * cromimage
+int vmlbuild (	unsigned char * vmlimage,
+		unsigned char * cromimage
 		)
 {
 	FILE *f;
@@ -274,10 +274,10 @@ int vmlbuild (	const char * vmlimage,
 }
 
 int romcopy (
-		const char * blbinname,
-		const char * cromimage,
-		const char * binname256,
-		const char * binname1024
+		unsigned char * blbinname,
+		unsigned char * cromimage,
+		unsigned char * binname256,
+		unsigned char * binname1024
 		
 		)
 {
@@ -493,17 +493,17 @@ int main (int argc, const char * argv[])
 	}
 
 	if (!strcmp(argv[1],"-xbe")) { 
-		xberepair(argv[2],argv[3]);
+		xberepair((unsigned char*)argv[2],(unsigned char*)argv[3]);
 	}
 	else if (!strcmp(argv[1],"-vml")) { 
-		vmlbuild(argv[2],argv[3]);
+		vmlbuild((unsigned char*)argv[2],(unsigned char*)argv[3]);
 	}
 	else if (!strcmp(argv[1],"-rom")) { 
 		if( argc != 6  ) {
 			showUsage(argv[0]);
 			exit(1);
 		}
-		romcopy(argv[2],argv[3],argv[4],argv[5]);
+		romcopy((unsigned char*)argv[2],(unsigned char*)argv[3],(unsigned char*)argv[4],(unsigned char*)argv[5]);
 	}
 	else {
 		showUsage(argv[0]);

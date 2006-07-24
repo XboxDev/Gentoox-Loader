@@ -8,13 +8,15 @@ INCLUDE = -I$(TOPDIR)/grub -I$(TOPDIR)/include -I$(TOPDIR)/ -I./ -I$(TOPDIR)/fs/
 	-I$(TOPDIR)/drivers/video -I$(TOPDIR)/drivers/ide -I$(TOPDIR)/drivers/flash -I$(TOPDIR)/lib/misc \
 	-I$(TOPDIR)/boot_xbe/ -I$(TOPDIR)/fs/grub -I$(TOPDIR)/lib/font \
 	-I$(TOPDIR)/startuploader -I$(TOPDIR)/drivers/cpu \
-	-I$(TOPDIR)/lib/jpeg/ -I$(TOPDIR)/menu/actions -I$(TOPDIR)/menu/textmenu -I$(TOPDIR)/menu/iconmenu
+	-I$(TOPDIR)/lib/jpeg/ -I$(TOPDIR)/menu/actions -I$(TOPDIR)/menu/textmenu \
+	-I$(TOPDIR)/menu/iconmenu -I$(TOPDIR)/lwip/src/include \
+	-I$(TOPDIR)/lwip/src/include/ipv4
 
 #These are intended to be non-overridable.
 CROM_CFLAGS=$(INCLUDE)
 
 #You can override these if you wish.
-CFLAGS= -O2 -g -mcpu=pentium -Werror -pipe -fomit-frame-pointer -Wstrict-prototypes
+CFLAGS= -O2 -g -march=pentium -Werror -pipe -fomit-frame-pointer -Wstrict-prototypes -DIPv4 -fpack-struct
 
 # add the option for gcc 3.3 only, again, non-overridable
 ifeq ($(GCC_3.3), 1)
@@ -27,13 +29,13 @@ OBJCOPY = objcopy
 export CC
 
 TOPDIR  := $(shell /bin/pwd)
-SUBDIRS	= boot_rom fs drivers lib boot menu
+SUBDIRS	= boot_rom fs drivers lib boot menu lwip
 #### Etherboot specific stuff
 ifeq ($(ETHERBOOT), yes)
 ETH_SUBDIRS = etherboot
 CROM_CFLAGS	+= -DETHERBOOT
 ETH_INCLUDE = 	-I$(TOPDIR)/etherboot/include -I$(TOPDIR)/etherboot/arch/i386/include	
-ETH_CFLAGS  = 	-O2 -mcpu=pentium -Werror $(ETH_INCLUDE) -Wstrict-prototypes -fomit-frame-pointer -pipe -Ui386
+ETH_CFLAGS  = 	-O2 -march=pentium -Werror $(ETH_INCLUDE) -Wstrict-prototypes -fomit-frame-pointer -pipe -Ui386
 endif
 
 LDFLAGS-ROM     = -s -S -T $(TOPDIR)/scripts/ldscript-crom.ld
@@ -80,20 +82,38 @@ OBJECTS-CROM += $(TOPDIR)/obj/rc4.o
 OBJECTS-CROM += $(TOPDIR)/obj/sha1.o
 OBJECTS-CROM += $(TOPDIR)/obj/BootVideoHelpers.o
 OBJECTS-CROM += $(TOPDIR)/obj/vsprintf.o
+OBJECTS-CROM += $(TOPDIR)/obj/Gentoox.o
 OBJECTS-CROM += $(TOPDIR)/obj/LED.o
 OBJECTS-CROM += $(TOPDIR)/obj/IconMenu.o
 OBJECTS-CROM += $(TOPDIR)/obj/IconMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/TextMenu.o
 OBJECTS-CROM += $(TOPDIR)/obj/TextMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/IPMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/URLMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/KernelPathMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/InitrdPathMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/AppendPathMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/VideoMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/ResetMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/HDDFlashMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/CDMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/InfoMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/FlashMenuInit.o
-OBJECTS-CROM += $(TOPDIR)/obj/HddMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/HDDMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/LEDMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/MenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/VideoMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/InfoMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/ResetMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/FlashMenuActions.o
-OBJECTS-CROM += $(TOPDIR)/obj/HddMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/IPMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/URLMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/KernelPathMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/InitrdPathMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/AppendPathMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/HDDMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/CDMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/LEDMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/Confirm.o
 OBJECTS-CROM += $(TOPDIR)/obj/LoadLinux.o
 OBJECTS-CROM += $(TOPDIR)/obj/setup.o
@@ -105,7 +125,6 @@ OBJECTS-CROM += $(TOPDIR)/obj/ioapic.o
 OBJECTS-CROM += $(TOPDIR)/obj/BootInterrupts.o
 OBJECTS-CROM += $(TOPDIR)/obj/fsys_reiserfs.o
 OBJECTS-CROM += $(TOPDIR)/obj/fsys_ext2fs.o
-OBJECTS-CROM += $(TOPDIR)/obj/fsys_ufs2.o
 OBJECTS-CROM += $(TOPDIR)/obj/char_io.o
 OBJECTS-CROM += $(TOPDIR)/obj/disk_io.o
 OBJECTS-CROM += $(TOPDIR)/obj/decode-jpg.o
@@ -114,6 +133,7 @@ OBJECTS-CROM += $(TOPDIR)/obj/BootFlashUi.o
 OBJECTS-CROM += $(TOPDIR)/obj/BootEEPROM.o
 OBJECTS-CROM += $(TOPDIR)/obj/BootParser.o
 OBJECTS-CROM += $(TOPDIR)/obj/BootFATX.o
+OBJECTS-CROM += $(TOPDIR)/obj/ProgressBar.o
 #USB
 OBJECTS-CROM += $(TOPDIR)/obj/config.o 
 OBJECTS-CROM += $(TOPDIR)/obj/hcd-pci.o
@@ -144,8 +164,11 @@ OBJECTS-CROM += $(TOPDIR)/obj/xbox_pci.o
 OBJECTS-CROM += $(TOPDIR)/obj/etherboot_config.o
 OBJECTS-CROM += $(TOPDIR)/obj/xbox_main.o
 OBJECTS-CROM += $(TOPDIR)/obj/elf.o
-OBJECTS-CROM += $(TOPDIR)/obj/exec_elf.o
 endif
+
+SUBDIRS += tcpListener networktools
+OBJECTS-LWIP = $(addprefix $(TOPDIR)/obj/,mem.o memp.o netif.o pbuf.o raw.o stats.o sys.o tcp.o tcp_in.o tcp_out.o udp.o dhcp.o icmp.o ip.o inet.o ip_addr.o ip_frag.o etharp.o tcpListener.o netflash.o netboot.o webboot.o webupdate.o)
+OBJECTS-CROM += $(OBJECTS-LWIP)
 
 RESOURCES = $(TOPDIR)/obj/backdrop.elf
 

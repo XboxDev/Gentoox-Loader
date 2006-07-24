@@ -10,7 +10,7 @@ extern unsigned int current_keyboard_key;
 
 int risefall_xpad_BUTTON(unsigned char selected_Button) {
 	
-      	int xpad_id; 
+	int xpad_id; 
 	int match;
 	extern int xpad_num;
 	
@@ -87,9 +87,8 @@ int risefall_xpad_BUTTON(unsigned char selected_Button) {
 	// Xbox controller section
 	if (selected_Button < 6) {
        	
-       		unsigned char Button;
-       	
-       		Button = XPAD_current[0].keys[selected_Button];
+		unsigned char Button;
+		Button = XPAD_current[0].keys[selected_Button];
 	
 		if ((Button>0x30)&&(xpad_button_history[selected_Button]==0)) {
 			// Button Rising Edge
