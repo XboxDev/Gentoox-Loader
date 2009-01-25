@@ -8,4 +8,9 @@
  ***************************************************************************/
 #include "include/config.h"
 
+void FlashBiosFromHDD(void *fname);
 void FlashBiosFromCD(void *cdromId);
+
+void enableNetflash(void *whatever);
+void enableWebupdate(void *whatever);
+

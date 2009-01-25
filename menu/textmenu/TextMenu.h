@@ -23,7 +23,7 @@
 struct TEXTMENUITEM;
 struct TEXTMENU;
 
-#define MENUCAPTIONSIZE 50
+#define MENUCAPTIONSIZE 200
 extern int breakOutOfMenu;
 
 typedef struct TEXTMENUITEM {
@@ -34,6 +34,11 @@ typedef struct TEXTMENUITEM {
 	void (*functionPtr) (void *);
 	//Pointer to data used by the function above.
 	void *functionDataPtr;
+
+	void (*functionLeftPtr) (void *);
+	void (*functionRightPtr) (void *);
+	void *functionLeftDataPtr;
+	void *functionRightDataPtr;
 	//Next / previous menu items within this menu
 	struct TEXTMENUITEM *previousMenuItem;
 	struct TEXTMENUITEM *nextMenuItem;
@@ -45,6 +50,9 @@ typedef struct TEXTMENU {
 	//A pointer to the first item of the linked list of menuitems that
 	//make up this menu.
 	TEXTMENUITEM* firstMenuItem;
+	u32 timeout;
+	int longTitle;
+	int visibleCount;
 } TEXTMENU;
 
 #endif

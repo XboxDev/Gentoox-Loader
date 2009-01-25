@@ -22,6 +22,9 @@
  * Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+int strlen(const char * s);
+
+
 #if 0
 #include <linux/config.h>
 

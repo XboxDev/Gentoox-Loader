@@ -18,6 +18,8 @@
  */
 #include "boot.h"
 
+extern void * memcpy(void *, const void *, unsigned int);
+
 #ifdef FSYS_EXT2FS
 
 #include "shared.h"

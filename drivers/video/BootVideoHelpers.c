@@ -12,6 +12,7 @@
 // These are helper functions for displaying bitmap video
 // includes an antialiased (4bpp) proportional bitmap font (n x 16 pixel)
 
+int sprintf(char * buf, const char *fmt, ...);
 
 #include  "boot.h"
 #include "video.h"
@@ -225,7 +226,6 @@ bool BootVideoJpegUnpackAsRgb(u8 *pbaJpegFileImage, JPEG * pJpeg) {
 	if((jpeg_decode(pbaJpegFileImage, pJpeg->pData, 
 		((width + 15) & ~15), ((height + 15) & ~15), depth, decdata)) != 0) {
 		printk("Error decode picture\n");
-		// We dont really want this to lockup - those poor TSOPers!
 		//while(1);
 	}
 	
