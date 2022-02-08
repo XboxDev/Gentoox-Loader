@@ -1,7 +1,7 @@
 ////////////////////// compile-time options ////////////////////////////////
 
 //Cromwell version number
-#define VERSION "5.2"
+#define VERSION "5.3"
 
 // selects between the supported video modes, see boot.h for enum listing those available
 //#define VIDEO_PREFERRED_MODE VIDEO_MODE_800x600
@@ -9,7 +9,7 @@
 
 //Uncomment to include BIOS flashing support from CD
 //Uncommenting for this release - it's broken for now.
-//#define FLASH
+#define FLASH
 
 //Uncomment to enable the 'advanced menu'
 #define ADVANCED_MENU

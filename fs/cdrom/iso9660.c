@@ -131,16 +131,24 @@ unsigned long read_dir(int driveId, struct iso_directory_record *dir_read, char 
 	return sect;
 }
 
-void read_file(int driveId, struct iso_directory_record *dir_read, char *buffer) {
+unsigned long read_file(int driveId, struct iso_directory_record *dir_read, char *buffer, unsigned int max_bytes_to_read) {
 	unsigned long read_size;
+	unsigned long bytes_read;
 	unsigned long offset;
 	int i;
 	char *tmpbuff;
 
+	
 	offset = *((unsigned long *)(dir_read->extent));
 	tmpbuff = (char *) malloc(ISO_BLOCKSIZE);
+
+	if (max_bytes_to_read > *dir_read->size) {
+		read_size = *(unsigned long *)dir_read->size;
+	}
+	else read_size = *(unsigned long *)max_bytes_to_read;
 	
-	read_size = *((unsigned long *)(dir_read->size));	
+	bytes_read = read_size;
+	
 	if(read_size <= ISO_BLOCKSIZE) {
 		read_size = ISO_BLOCKSIZE;
 	} else {
@@ -148,18 +156,21 @@ void read_file(int driveId, struct iso_directory_record *dir_read, char *buffer)
 	}
 	
 //	printk("         read_file sector %d %d\n", offset, read_size);
+//	printk("         read %d\n", bytes_read);
 	
 	for(i = 0; i < (read_size >> ISOFS_BLOCK_BITS) ; i++) {
 		memset(tmpbuff, 0x0, ISO_BLOCKSIZE);
 		BootIdeReadSector(driveId, tmpbuff, offset , 0, ISO_BLOCKSIZE);
 		offset++;
 		if(((i+1) * ISO_BLOCKSIZE) > read_size) {
-			memcpy(&buffer[i * ISO_BLOCKSIZE], tmpbuff, (i * ISO_BLOCKSIZE) - *((unsigned long *)(dir_read->size)));
+			memcpy(&buffer[i * ISO_BLOCKSIZE], tmpbuff, (i * ISO_BLOCKSIZE) - read_size);
 		} else {
 			memcpy(&buffer[i * ISO_BLOCKSIZE], tmpbuff, ISO_BLOCKSIZE);
 		}
 	}
 	free(tmpbuff);
+
+	return bytes_read;
 }
 
 int BootIso9660GetFile(int driveId, char *szcPath, unsigned char *pbaFile, unsigned int dwFileLengthMax) {
@@ -187,14 +198,9 @@ int BootIso9660GetFile(int driveId, char *szcPath, unsigned char *pbaFile, unsig
 	offset = read_dir(driveId, rootd, szcPath, "", dir);
 	
 	if(offset > 0) {
-		if(*((unsigned long *)(dir->size)) > dwFileLengthMax) {
-			free(pvd);
-			free(dir);
-			return -1;
-		}
-		read_file(driveId, dir, pbaFile);
-		return *((unsigned long *)(dir->size));
+		return read_file(driveId, dir, pbaFile, dwFileLengthMax);
 	} else {
+		//Not found
 		free(pvd);
 		free(dir);
 		return -1;

@@ -455,9 +455,9 @@ int LoadKernelCdrom(CONFIGENTRY *config) {
 #ifdef FLASH 
 int BootLoadFlashCD(int cdromId) {
 	busyLED();
-	u32 dwConfigSize=0;
+	long imageSize=0;
 	int n;
-	int cdPresent=0;
+	int imageFound=0;
 	struct SHA1Context context;
 	unsigned char SHA1_result[20];
 	unsigned char checksum[20];
@@ -465,76 +465,122 @@ int BootLoadFlashCD(int cdromId) {
 	memset((u8 *)KERNEL_SETUP,0,4096);
 
 	//See if we already have a CDROM in the drive
-	//Try for 4 seconds.
+	//Try for 4 seconds - takes a while to 'spin up'.
 	I2CTransmitWord(0x10, 0x0c01); // close DVD tray
+
+	printk("\n\n\n\n\n        Checking disc");
+	dots();
+
 	for (n=0;n<16;++n) {
-		if((BootIso9660GetFile(cdromId,"/image.bin", (u8 *)KERNEL_SETUP, 0x10)) >=0 ) {
-			cdPresent=1;
+		imageSize = BootIso9660GetFile(cdromId,"/image.bin", (u8 *)KERNEL_PM_CODE, 0x10);
+		if (imageSize>0) {
+			imageFound=1;
 			break;
 		}
 		wait_ms(250);
 	}
 
-	if (!cdPresent) {
+	if (!imageFound) {
 		//Needs to be changed for non-xbox drives, which don't have an eject line
 		//Need to send ATA eject command.
 		I2CTransmitWord(0x10, 0x0c00); // eject DVD tray
-		wait_ms(2000); // Wait for DVD to become responsive to inject command
-			
+		cromwellWarning();
 		VIDEO_ATTR=0xffeeeeff;
-		
-		//printk("Please insert CD with image.bin file on, and press Button A\n");
+		printk("        Please insert a CD which contains \"image.bin\" and close the DVD tray");
+		dots();
+		inputLED();
+
+		wait_ms(1000); // Wait for DVD to become responsive to inject command
 
 		while(1) {
+			// Make button 'A' close the DVD tray
 			if (risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) == 1) {
-				I2CTransmitWord(0x10, 0x0c01); // close DVD tray
+				I2CTransmitWord(0x10, 0x0c01);
+				// May as well break here too incase the drive is
+				// a non-standard Xbox drive and can't report whether the
+				// tray is closing or not.
 				wait_ms(500);
 				break;
 			}
-        	        USBGetEvents();
+
+			// If the drive is closing, exit the loop.  This accounts
+			// for people pushing the drive shut or even pressing the eject
+			// button.
+			if (DVD_TRAY_STATE == DVD_CLOSING) {
+				wait_ms(500);
+				break;
+			}
 			wait_ms(10);
 		}						
+		busyLED();
 
 		VIDEO_ATTR=0xffffffff;
 
-		// wait until the media is readable
-		while(1) {
-			if((BootIso9660GetFile(cdromId,"/image.bin", (u8 *)KERNEL_SETUP, 0x10)) >=0 ) {
+		//Try to load image.bin - if we can't after a while, give up.
+		for (n=0;n<48;++n) {
+			imageSize = BootIso9660GetFile(cdromId,"/image.bin", (u8 *)KERNEL_PM_CODE, 0x10);
+			if (imageSize>0) {
+				imageFound=1;
 				break;
 			}
-			wait_ms(200);
+			wait_ms(250);
 		}
 	}
-	//printk("CDROM: ");
-	//printk("Loading bios image from CDROM:/image.bin. \n");
-	dwConfigSize=BootIso9660GetFile(cdromId, "/image.bin", (u8 *)KERNEL_PM_CODE, 256*1024);
-	
-	if( dwConfigSize < 0 ) { //It's not there
-		//printk("image.bin not found on CDROM... Halting\n");
-		while(1) ;
+
+	//Failed to find the image.bin file
+	if (!imageFound) {
+		cromwellWarning();
+		printk("        Could not find the image.bin file.\n");
+		wait_ms(2000);
+		inputLED();
+		return 0;
 	}
 
-	//printk("Image size: %i\n", dwConfigSize);
-        if (dwConfigSize!=256*1024) {
-		//printk("Image is not a 256kB image - aborted\n");
-		while (1);
-	}
-	SHA1Reset(&context);
-	SHA1Input(&context,(u8 *)KERNEL_PM_CODE,dwConfigSize);
-	SHA1Result(&context,SHA1_result);
-	memcpy(checksum,SHA1_result,20);
-	//printk("Result code: %d\n", BootReflashAndReset((u8*) KERNEL_PM_CODE, (u32) 0, (u32) dwConfigSize));
-	SHA1Reset(&context);
-	SHA1Input(&context,(void *)LPCFlashadress,dwConfigSize);
-	SHA1Result(&context,SHA1_result);
-	if (memcmp(checksum,SHA1_result,20)==0) {
-		//printk("Checksum in flash matches - Flash successful.\nRebooting.");
+	cromwellSuccess();
+
+	printk("        Reading image.bin");
+	dots();
+
+	// Read in a full 1MB bios (read will be truncated if the file is not this big).
+	imageSize=BootIso9660GetFile(cdromId, "/image.bin", (u8 *)KERNEL_PM_CODE, 4*256*1024);
+	
+	if(imageSize < 0) { //It's not there
+		cromwellWarning();
+		printk("        image.bin not found on CD.\n");
 		wait_ms(2000);
-		I2CRebootSlow();	
-	} else {
-		//printk("Checksum in Flash not matching - MISTAKE - Reflashing!\n");
-		//printk("Result code: %d\n", BootReflashAndReset((u8*) KERNEL_PM_CODE, (u32) 0, (u32) dwConfigSize));
+		inputLED();
+		return 0;
 	}
+
+	if((imageSize > 0) && (imageSize <= 4*256*1024) && (imageSize%256 == 0)) {
+		SHA1Reset(&context);
+		SHA1Input(&context,(u8 *)KERNEL_PM_CODE,imageSize);
+		SHA1Result(&context,SHA1_result);
+		memcpy(checksum,SHA1_result,20);
+		ClearScreen();
+		BootReflashAndReset((u8*) KERNEL_PM_CODE, (u32) 0, (u32) imageSize);
+		SHA1Reset(&context);
+		SHA1Input(&context,(void *)LPCFlashadress,imageSize);
+		SHA1Result(&context,SHA1_result);
+		if (memcmp(checksum,SHA1_result,20)==0) {
+			//printk("Checksum in flash matches - Flash successful.\nRebooting.");
+			wait_ms(2000);
+			I2CRebootSlow();	
+		} else {
+			//printk("Checksum in Flash not matching - MISTAKE - Reflashing!\n");
+			//printk("Result code: %d\n", BootReflashAndReset((u8*) KERNEL_PM_CODE, (u32) 0, (u32) imageSize));
+		}
+	} else {
+		cromwellWarning();
+		printk("        Image size is not divisible by 256.");
+		printk("        (e.g. 256K, 512K, 768K, 1024K...");
+		wait_ms(2000);
+		inputLED();
+		return 0;
+	}
+	// Should never get here.
+	wait_ms(2000);
+	inputLED();
 	return 0;
 }
 #endif //Flash

@@ -131,7 +131,8 @@ int run_lwip(void)
 {
 	struct ip_addr ipaddr, netmask, gw;
 	struct netif netif;
-	printk("Initialising network");
+	busyLED();
+	printk("\n\n\n\n\n        Initialising network");
 	dots();
 	mem_init();
 	memp_init();
@@ -142,7 +143,7 @@ int run_lwip(void)
 	tcp_init();
 	etharp_init();
 	cromwellSuccess();
-	printk("Waiting for IP");
+	printk("        Waiting for IP");
 	dots();
 	printk(" ");
 	

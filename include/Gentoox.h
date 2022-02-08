@@ -56,6 +56,16 @@ void cromwellError(void) {
 	errorLED();
 }
 
+void cromwellWarning(void) {
+   VIDEO_ATTR=0xffd8d8d8;
+   printk("\t[ ");
+   VIDEO_ATTR=0xffffae01;
+   printk("!!");
+   VIDEO_ATTR=0xffd8d8d8;
+   printk(" ]\n");
+	errorLED();
+}
+
 void cromwellSuccess(void) {
    VIDEO_ATTR=0xffd8d8d8;
    printk("\t[ ");
