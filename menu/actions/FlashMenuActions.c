@@ -58,7 +58,6 @@ void FlashBiosFromCD(void *cdromId) {
 
 void enableLwip(void *whatever) {
 #ifdef FLASH
-	initialiseNetwork();
 	netflash();
 #endif
 }

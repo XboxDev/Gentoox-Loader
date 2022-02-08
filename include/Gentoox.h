@@ -18,7 +18,7 @@
  */
 
 void errorLED(void) {
-   I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_RED2);
+   I2cSetFrontpanelLed(I2C_LED_RED0);
 }
 
 void busyLED(void) {
@@ -31,6 +31,31 @@ void inputLED(void) {
 
 void goodLED(void) {
 	I2cSetFrontpanelLed(I2C_LED_GREEN0 | I2C_LED_GREEN2);	
+}
+
+void importantLED(void) {
+	I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_GREEN1 | I2C_LED_RED1 | I2C_LED_RED2 | I2C_LED_GREEN3 | I2C_LED_RED3);	
+}
+
+void downloadingLED(void) {
+	I2cSetFrontpanelLed(I2C_LED_GREEN0 | I2C_LED_RED0 | I2C_LED_GREEN1 | I2C_LED_RED2 | I2C_LED_RED3);	
+}
+
+
+void uberLED(void) {
+	I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_RED2);	
+}
+
+void highLED(void) {
+	I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_RED1 | I2C_LED_RED2 | I2C_LED_RED3);	
+}
+
+void midLED(void) {
+	I2cSetFrontpanelLed(I2C_LED_GREEN0 | I2C_LED_RED0 | I2C_LED_GREEN1 | I2C_LED_RED1 | I2C_LED_GREEN2 | I2C_LED_RED2);	
+}
+
+void lowLED(void) {
+	I2cSetFrontpanelLed(I2C_LED_GREEN0 | I2C_LED_GREEN1 | I2C_LED_GREEN2 | I2C_LED_GREEN3);	
 }
 
 void dots(void) {

@@ -552,8 +552,8 @@ int DriveSecurityChange(unsigned uIoBase, int driveId, ide_command_t ide_cmd, un
 		//Cromwell locks drives in high security mode (NOT maximum security mode).
 		//This means that even if you lose the normal (user) password, you can
 		//unlock them again using the master password set below.
-		//Master password is XBOXLINUX (in ascii, NULL padded)
-		char *master_password="XBOXLINUX";
+		//Master password is GENTOOX (in ascii, NULL padded)
+		char *master_password="GENTOOX";
 		
 		//We first lock the drive with the master password
 		//Just in case we ever need to unlock it in an emergency
@@ -561,7 +561,7 @@ int DriveSecurityChange(unsigned uIoBase, int driveId, ide_command_t ide_cmd, un
 		//Set master password flag
 		ide_cmd_data[0]|=0x01;
 	
-		memcpy(&ide_cmd_data[2],master_password,9);
+		memcpy(&ide_cmd_data[2],master_password,7);
 		
 		if(BootIdeIssueAtaCommand(uIoBase, ide_cmd, &tsicp1)) return 1;
 		BootIdeWaitDataReady(uIoBase);

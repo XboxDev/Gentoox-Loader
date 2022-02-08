@@ -2,6 +2,8 @@
 #include "lwip/mem.h"
 #include "netif/etharp.h"
 #include "lwip/tcp.h"
+#include "xpad.h"
+
 
 struct eth_addr ethaddr= {0,0x0d,0xff,0xff,0,0};
 
@@ -132,7 +134,7 @@ int run_lwip(void)
 	struct ip_addr ipaddr, netmask, gw;
 	struct netif netif;
 	busyLED();
-	printk("\n\n\n\n\n        Initialising network");
+	printk("\n\n\n\n\n        Initialising TCP/IP");
 	dots();
 	mem_init();
 	memp_init();
@@ -143,6 +145,8 @@ int run_lwip(void)
 	tcp_init();
 	etharp_init();
 	cromwellSuccess();
+	printk("\n        Hold Button 'B' to abort.\n\n");
+
 	printk("        Waiting for IP");
 	dots();
 	printk(" ");
@@ -167,7 +171,7 @@ int run_lwip(void)
    int divisor = 0;
 	int first = 1;
 	while (1) {
-		
+		if((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_B) == 1)) return 0;		
 		if (!ebd_wait(&netif, TCP_TMR_INTERVAL)) {
 			if (divisor++ == 60 * 4) {
 				if (first && netif.dhcp->state != DHCP_BOUND) {
@@ -182,6 +186,7 @@ int run_lwip(void)
 				}
 				first = 0;
 				dhcp_coarse_tmr();
+
 				divisor=0;
 			}
 			if (divisor & 1)

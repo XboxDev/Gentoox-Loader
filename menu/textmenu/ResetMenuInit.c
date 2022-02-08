@@ -17,7 +17,7 @@ TEXTMENU* ResetMenuInit(void) {
 	
 	menuPtr = (TEXTMENU*)malloc(sizeof(TEXTMENU));
 	memset(menuPtr,0x00,sizeof(TEXTMENU));
-	strcpy(menuPtr->szCaption, "Reset Menu");
+	strcpy(menuPtr->szCaption, "Power Menu");
 
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));

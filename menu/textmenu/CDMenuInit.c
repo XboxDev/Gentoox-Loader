@@ -10,43 +10,30 @@
 #include "include/boot.h"
 #include "BootIde.h"
 #include "TextMenu.h"
-#include "FlashMenuActions.h"
+#include "CDMenuActions.h"
 
-TEXTMENU* FlashMenuInit(void) {
+TEXTMENU *CDMenuInit(void) {
 	TEXTMENUITEM *itemPtr;
 	TEXTMENU *menuPtr;
 	int i=0;
 
 	menuPtr = (TEXTMENU*)malloc(sizeof(TEXTMENU));
 	memset(menuPtr,0x00,sizeof(TEXTMENU));
-	strcpy(menuPtr->szCaption, "Flash Menu");
-	
-	for (i=0; i<2; ++i) {
-		if (tsaHarddiskInfo[i].m_fDriveExists && tsaHarddiskInfo[i].m_fAtapi) {
- 			char *driveName=malloc(sizeof(char)*32);
-			itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
-			memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-			sprintf(itemPtr->szCaption,"CD Flash (image.bin)");// (hd%c)",i ? 'b':'a');
-			itemPtr->functionPtr= FlashBiosFromCD;
-    		itemPtr->functionDataPtr = malloc(sizeof(int));
-			*(int*)itemPtr->functionDataPtr = i;
-			TextMenuAddItem(menuPtr, itemPtr);
-		}
-	}
+	strcpy(menuPtr->szCaption, "CD Menu");
 
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-   sprintf(itemPtr->szCaption,"HDD Flash");
-	itemPtr->functionPtr=DrawChildTextMenu;
-	itemPtr->functionDataPtr = (void *)HDDFlashMenuInit();
+	sprintf(itemPtr->szCaption,"Eject CD");
+	itemPtr->functionPtr= CDEject;
+  	itemPtr->functionDataPtr = NULL;
 	TextMenuAddItem(menuPtr, itemPtr);
 
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-   sprintf(itemPtr->szCaption,"Net Flash");
-	itemPtr->functionPtr= enableLwip;
-	itemPtr->functionDataPtr= NULL;
+	sprintf(itemPtr->szCaption,"Inject CD");
+	itemPtr->functionPtr= CDInject;
+  	itemPtr->functionDataPtr = NULL;
 	TextMenuAddItem(menuPtr, itemPtr);
-
+		
 	return menuPtr;
 }

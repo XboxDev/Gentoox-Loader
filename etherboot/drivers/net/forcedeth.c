@@ -972,9 +972,9 @@ static int forcedeth_probe(struct dev *dev, struct pci_device *pci)
 		 * Bad mac address. At least one bios sets the mac address
 		 * to 01:23:45:67:89:ab
 		 */
-		printf("Invalid Mac address detected: %!\n",
-		       nic->node_addr);
-		printf("Please complain to your hardware vendor.\n");
+//		printf("Invalid Mac address detected: %!\n",
+//		       nic->node_addr);
+//		printf("Please complain to your hardware vendor.\n");
 		return 0;
 	}
 	//printf("%s: MAC Address %!, ", pci->name, nic->node_addr);

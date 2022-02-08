@@ -29,13 +29,25 @@ TEXTMENU* HDDFlashMenuInit(void) {
 	int res;
 	int dcluster;
 	char *path="\\BIOS\\";
+	char *fullPath = (char*)malloc(20);
+	char *fullPathptr = fullPath;
+
+	memset(fullPath, 0, 20);
+
+	// Generate the menu title.
+	strcpy(fullPath, "'C:");
+	fullPathptr += 3;
+	strcpy(fullPathptr, path);
+	fullPathptr += strlen(path);
+	strcpy(fullPathptr, "'");
+	fullPathptr = NULL;
 
 	partition = OpenFATXPartition(0, SECTOR_SYSTEM, SYSTEM_SIZE);
 
 	menuPtr = (TEXTMENU*)malloc(sizeof(TEXTMENU));
 	memset(menuPtr,0,sizeof(TEXTMENU));
 
-	strcpy(menuPtr->szCaption, "HDD Flash");
+	strcpy(menuPtr->szCaption, fullPath);
 
 	if(partition != NULL) {
 		dcluster = FATXFindDir(partition, FATX_ROOT_FAT_CLUSTER, "BIOS");

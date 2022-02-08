@@ -44,11 +44,11 @@ int initialiseNetwork(void)
 	//print_config();
 	if (eth_probe(dev) == -1)
 	{
-		printk("eth_probe failed\n");
+		//printk("eth_probe failed\n");
 	}
 }
 
-int etherboot(void)
+int initialiseNetwork(void)
 {
 	if (eth_load_configuration(dev) != 0)
 	{
@@ -58,6 +58,16 @@ int etherboot(void)
 	{
 		eth_load(dev);
 	}
+	else
+	{
+		eth_load(dev);
+	}
+}
+
+int netflash(void)
+{
+	extern int run_lwip(void);
+	run_lwip();
 }
 
 int netflash(void)

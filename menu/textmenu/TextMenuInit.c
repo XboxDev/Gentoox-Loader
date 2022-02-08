@@ -22,6 +22,16 @@ TEXTMENU *TextMenuInit(void) {
 	strcpy(menuPtr->szCaption, "Main Menu");
 	menuPtr->firstMenuItem=NULL;
 	
+#ifdef FLASH
+	//FLASH MENU
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+	strcpy(itemPtr->szCaption, "Flash Menu");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)FlashMenuInit();
+	TextMenuAddItem(menuPtr, itemPtr);
+#endif
+
 	//VIDEO SETTINGS MENU
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
@@ -33,23 +43,31 @@ TEXTMENU *TextMenuInit(void) {
 	//HDD MENU
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "Hdd Menu");
+	strcpy(itemPtr->szCaption, "HDD Menu");
 	itemPtr->functionPtr=DrawChildTextMenu;
-	itemPtr->functionDataPtr = (void *)HddMenuInit();
+	itemPtr->functionDataPtr = (void *)HDDMenuInit();
+	TextMenuAddItem(menuPtr, itemPtr);
+
+	//CD MENU
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+	strcpy(itemPtr->szCaption, "CD Menu");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)CDMenuInit();
 	TextMenuAddItem(menuPtr, itemPtr);
 	
-#ifdef FLASH
-	//FLASH MENU
+	// LED Menu
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "Flash Menu");
+	strcpy(itemPtr->szCaption, "LED Menu");
 	itemPtr->functionPtr=DrawChildTextMenu;
-	itemPtr->functionDataPtr = (void *)FlashMenuInit();
+	itemPtr->functionDataPtr = (void *)LEDMenuInit();
 	TextMenuAddItem(menuPtr, itemPtr);
-#endif
+
+	// Power Menu
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "Reset Menu");
+	strcpy(itemPtr->szCaption, "Power Menu");
 	itemPtr->functionPtr=DrawChildTextMenu;
 	itemPtr->functionDataPtr = (void *)ResetMenuInit();
 	TextMenuAddItem(menuPtr, itemPtr);

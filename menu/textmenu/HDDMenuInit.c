@@ -10,9 +10,9 @@
 #include "include/boot.h"
 #include "BootIde.h"
 #include "TextMenu.h"
-#include "HddMenuActions.h"
+#include "HDDMenuActions.h"
 
-TEXTMENU *HddMenuInit(void) {
+TEXTMENU *HDDMenuInit(void) {
 	TEXTMENUITEM *itemPtr;
 	TEXTMENU *menuPtr;
 	int i=0;
@@ -29,7 +29,7 @@ TEXTMENU *HddMenuInit(void) {
 				itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 				memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 				sprintf(itemPtr->szCaption,"Unlock HDD (hd%c)",i ? 'b':'a');
-				itemPtr->functionPtr= UnlockHdd;
+				itemPtr->functionPtr= UnlockHDD;
     				itemPtr->functionDataPtr = malloc(sizeof(int));
                         	*(int*)itemPtr->functionDataPtr = i;
 				TextMenuAddItem(menuPtr, itemPtr);
@@ -39,7 +39,7 @@ TEXTMENU *HddMenuInit(void) {
 				itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 				memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 				sprintf(itemPtr->szCaption,"Lock HDD (hd%c)",i ? 'b':'a');
-				itemPtr->functionPtr= LockHdd;
+				itemPtr->functionPtr= LockHDD;
     				itemPtr->functionDataPtr = malloc(sizeof(int));
                         	*(int*)itemPtr->functionDataPtr = i;
 				TextMenuAddItem(menuPtr, itemPtr);
@@ -49,7 +49,7 @@ TEXTMENU *HddMenuInit(void) {
 			itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 			memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 			sprintf(itemPtr->szCaption,"Display HDD password (hd%c)",i ? 'b':'a');
-			itemPtr->functionPtr= DisplayHddPassword;
+			itemPtr->functionPtr= DisplayHDDPassword;
     			itemPtr->functionDataPtr = malloc(sizeof(int));
                        	*(int*)itemPtr->functionDataPtr = i;
 			TextMenuAddItem(menuPtr, itemPtr);

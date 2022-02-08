@@ -218,6 +218,7 @@ extern void BootResetAction ( void ) {
 	nTempCursorMbrY=VIDEO_CURSOR_POSY;
 
 //	printk("i2C=%d SMC=%d, IDE=%d, tick=%d una=%d unb=%d\n", nCountI2cinterrupts, nCountInterruptsSmc, nCountInterruptsIde, BIOS_TICK_COUNT, nCountUnusedInterrupts, nCountUnusedInterruptsPic2);
+	initialiseNetwork();
 	IconMenuInit();
 	inputLED();
 	IconMenu();
