@@ -1,7 +1,7 @@
 ////////////////////// compile-time options ////////////////////////////////
 
 //Cromwell version number
-#define VERSION "5.1a"
+#define VERSION "5.2"
 
 // selects between the supported video modes, see boot.h for enum listing those available
 //#define VIDEO_PREFERRED_MODE VIDEO_MODE_800x600

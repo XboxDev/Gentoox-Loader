@@ -31,6 +31,10 @@ extern volatile int nInteruptable;
 volatile CURRENT_VIDEO_MODE_DETAILS vmode;
 extern KNOWN_FLASH_TYPE aknownflashtypesDefault[];
 
+void ClearScreen (void) {
+	BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
+}
+
 //////////////////////////////////////////////////////////////////////
 //
 //  BootResetAction()

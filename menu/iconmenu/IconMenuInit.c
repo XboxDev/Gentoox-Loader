@@ -63,7 +63,7 @@ void IconMenuInit(void) {
 	//Etherboot icon - if it's compiled in, it's always available.
 	iconPtr = (ICON *)malloc(sizeof(ICON));
 	iconPtr->iconSlot = ICON_SOURCE_SLOT3;
-	iconPtr->szCaption = "Etherboot";
+	iconPtr->szCaption = "Net Flash";
 	iconPtr->functionPtr = BootFromEtherboot;
 	AddIcon(iconPtr);
 #endif	

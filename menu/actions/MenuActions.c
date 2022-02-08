@@ -119,6 +119,7 @@ void DrawChildTextMenu(void *menu) {
 #ifdef ETHERBOOT 
 extern int etherboot(void);
 void BootFromEtherboot(void *data) {
+	busyLED();
 	etherboot();
 }
 #endif
