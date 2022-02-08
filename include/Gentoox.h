@@ -49,10 +49,7 @@ void cromwellError(void) {
    VIDEO_ATTR=0xffff0000;
    printk("!!");
    VIDEO_ATTR=0xffd8d8d8;
-   printk(" ]\n");
-   VIDEO_ATTR=0xffff0000;
-   printk("System halted.\n");
-   VIDEO_ATTR=0xffd8d8d8;
+   printk(" ]");
 	errorLED();
 }
 

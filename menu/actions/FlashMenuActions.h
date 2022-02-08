@@ -8,6 +8,7 @@
  ***************************************************************************/
 #include "include/config.h"
 
+void FlashBiosFromHDD(void *fname);
 void FlashBiosFromCD(void *cdromId);
 void enableLwip(void *whatever);
 

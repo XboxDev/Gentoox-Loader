@@ -19,7 +19,7 @@ TEXTMENU *HddMenuInit(void) {
 
 	menuPtr = (TEXTMENU*)malloc(sizeof(TEXTMENU));
 	memset(menuPtr,0x00,sizeof(TEXTMENU));
-	strcpy(menuPtr->szCaption, "Hdd Menu");
+	strcpy(menuPtr->szCaption, "HDD Menu");
 
 	for (i=0; i<2; ++i) {
 		if (tsaHarddiskInfo[i].m_fDriveExists && !tsaHarddiskInfo[i].m_fAtapi) {

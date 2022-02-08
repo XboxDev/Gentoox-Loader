@@ -20,7 +20,6 @@ TEXTMENU *VideoMenuInit(void) {
 	memset(menuPtr,0x00,sizeof(TEXTMENU));
 	strcpy(menuPtr->szCaption, "Video Settings Menu");
 
-
 //	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 //	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 //	if(((u8 *)&eeprom)[0x96]&0x01) {

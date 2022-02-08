@@ -85,6 +85,7 @@ OBJECTS-CROM += $(TOPDIR)/obj/TextMenu.o
 OBJECTS-CROM += $(TOPDIR)/obj/TextMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/VideoMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/ResetMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/HDDFlashMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/FlashMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/HddMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/MenuActions.o

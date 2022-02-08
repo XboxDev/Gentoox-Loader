@@ -300,6 +300,7 @@ void * memcpy(void *dest, const void *src,  size_t size);
 void * memset(void *dest, int data,  size_t size);
 int memcmp(const void *buffer1, const void *buffer2, size_t num);
 int _strncmp(const char *sz1, const char *sz2, int nMax);
+int _strncasecmp(const char *sz1, const char *sz2, int nMax);
 char * strcpy(char *sz, const char *szc);
 char * _strncpy (char * dest, const char * src, size_t n);
 void chrreplace(char *string, char search, char ch);

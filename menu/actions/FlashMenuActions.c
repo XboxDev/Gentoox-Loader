@@ -8,6 +8,48 @@
  ***************************************************************************/
 #include "FlashMenuActions.h"
 
+#include "include/boot.h"
+#include "BootIde.h"
+#include "TextMenu.h"
+#include "FlashMenuActions.h"
+
+#include "boot.h"
+#include "memory_layout.h"
+#include "BootFATX.h"
+
+extern void cromwellError(void);
+extern void dots(void);
+
+void FlashBiosFromHDD(void *fname) {
+#ifdef FLASH
+	int res;
+	int offset;
+
+	FATXPartition *partition;
+
+	partition = OpenFATXPartition(0, SECTOR_SYSTEM, SYSTEM_SIZE);
+
+	FATXFILEINFO fileinfo;
+	res = LoadFATXFilefixed(partition, fname, &fileinfo, (char*)0x100000);
+	if (!res) {
+		printk("\n\n\n\n\n        Loading BIOS failed");
+		dots();
+		cromwellError();
+		while(1);
+	}
+
+	offset = 0;
+
+	res = BootReflashAndReset((char*)0x100000,offset,fileinfo.fileSize);
+
+	printk("\n\n\n\n\n        Flash failed",res);
+   CloseFATXPartition(partition);
+	dots();
+	cromwellError();
+	while(1);
+#endif
+}
+
 void FlashBiosFromCD(void *cdromId) {
 #ifdef FLASH
 	BootLoadFlashCD(*(int *)cdromId);

@@ -33,6 +33,15 @@ TEXTMENU* FlashMenuInit(void) {
 			TextMenuAddItem(menuPtr, itemPtr);
 		}
 	}
+
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+   sprintf(itemPtr->szCaption,"HDD Flash");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)HDDFlashMenuInit();
+   *(int*)itemPtr->functionDataPtr = i;
+	TextMenuAddItem(menuPtr, itemPtr);
+
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
    sprintf(itemPtr->szCaption,"Net Flash");
