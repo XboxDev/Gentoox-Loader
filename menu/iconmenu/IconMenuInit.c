@@ -106,7 +106,7 @@ void InitWebBootIcons(void) {
 	ICON *iconPtr=NULL;
 	iconPtr = (ICON *)malloc(sizeof(ICON));
   	iconPtr->iconSlot = ICON_SOURCE_SLOT3;
-	iconPtr->szCaption = "WebBoot";
+	iconPtr->szCaption = "Web Boot";
 	iconPtr->functionPtr = AdvancedMenu;
 	iconPtr->functionDataPtr = (void *)IPMenuInit();
 	AddIcon(iconPtr);
@@ -116,7 +116,7 @@ void InitNetBootIcons(void) {
 	ICON *iconPtr=NULL;
 	iconPtr = (ICON *)malloc(sizeof(ICON));
   	iconPtr->iconSlot = ICON_SOURCE_SLOT3;
-	iconPtr->szCaption = "NetBoot";
+	iconPtr->szCaption = "Net Boot";
 	iconPtr->functionPtr = BootFromNet;
 	iconPtr->functionDataPtr = NULL;
 	AddIcon(iconPtr);

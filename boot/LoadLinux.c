@@ -545,6 +545,8 @@ int BootLoadFlashCD(int cdromId) {
 
 		busyLED();
 
+		busyLED();
+
 		VIDEO_ATTR=0xffffffff;
 
 		//Try to load image.bin - if we can't after a while, give up.

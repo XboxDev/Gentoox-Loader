@@ -139,7 +139,7 @@ close_conn(struct tcp_pcb *pcb, struct http_state *hs)
 			if(hs->data_len > 0) {
 				cromwellSuccess();
 			} else {
-				printk("\t[ skipped ]");
+				printk("\t[ skipped ]\n");
 			}
 //			printk("           Got Initrd: %i\n", hs->data_len);
 			initrdSize = hs->data_len;
