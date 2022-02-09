@@ -59,6 +59,7 @@
  *
  */
 
+#include "boot.h"
 #include "lwip/opt.h"
 
 #include "lwip/stats.h"

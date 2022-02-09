@@ -30,6 +30,7 @@
  * Modified: Thomas Pedley <gentoox@shallax.com>
  */
 
+#include "boot.h"
 #include "lwip/debug.h"
 #include "lwip/stats.h"
 #include "lwip/tcp.h"

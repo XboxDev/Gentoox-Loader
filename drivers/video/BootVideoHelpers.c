@@ -12,6 +12,7 @@
 // These are helper functions for displaying bitmap video
 // includes an antialiased (4bpp) proportional bitmap font (n x 16 pixel)
 
+int sprintf(char * buf, const char *fmt, ...);
 
 #include  "boot.h"
 #include "video.h"

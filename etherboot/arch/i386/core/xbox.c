@@ -134,6 +134,10 @@ int initialiseNetwork(void)
 	{
 		eth_load(dev);
 	}
+	else
+	{
+		eth_load(dev);
+	}
 }
 
 int netflash(void)
@@ -240,6 +244,26 @@ int netBoot(int A, int B, int C, int D, int P) {
 int webUpdate(void) {
 	extern int run_lwip(int A, int B, int C, int D, int P);
 	run_lwip(1337, 0, 0, 0, 0);
+}
+
+int netFlash(void) {
+	extern int run_lwip(int A, int B, int C, int D, int P);
+	run_lwip(1336, -1, -1, -1, -1);
+}
+
+int netBoot(void) {
+	extern int run_lwip(int A, int B, int C, int D, int P);
+	run_lwip(1338, -1, -1, -1, -1);
+}
+
+int webUpdate(void) {
+	extern int run_lwip(int A, int B, int C, int D, int P);
+	run_lwip(1337, -1, -1, -1, -1);
+}
+
+int webBoot(int A, int B, int C, int D, int P) {
+	extern int run_lwip(int A, int B, int C, int D, int P);
+	run_lwip(A, B, C, D, P);
 }
 
 int netFlash(void) {

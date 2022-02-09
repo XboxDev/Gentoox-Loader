@@ -43,7 +43,7 @@
  */
 
 
-
+#include "boot.h"
 #include "lwip/def.h"
 #include "lwip/opt.h"
 

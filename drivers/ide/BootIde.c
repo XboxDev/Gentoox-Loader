@@ -4,6 +4,9 @@
  *    Copyright (C) 2000 Universal Talkware Inc.
  */
 
+int sprintf(char * buf, const char *fmt, ...);
+char * strncpy(char * dest,const char *src,int count);
+
 #include "boot.h"
 #include "shared.h"
 #include "BootEEPROM.h"

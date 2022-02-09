@@ -36,7 +36,7 @@ void * memcpy(void * to, const void * from, size_t n)
 }
 
 
-size_t strlen(const char * s)
+int strlen(const char * s)
 {
 	int d0;
 	register int __res;
@@ -122,7 +122,7 @@ char * strcpy(char * dest,const char *src)
 	return dest;
 }
 
-char * strncpy(char * dest,const char *src,size_t count)
+char * strncpy(char * dest,const char *src,int count)
 {
 	int d0, d1, d2, d3;
 	__asm__ __volatile__(
@@ -468,3 +468,28 @@ void ListEntryRemove(LIST_ENTRY *plistentryCurrent)
 		plistentryCurrent->m_plistentryNext->m_plistentryPrevious=plistentryCurrent->m_plistentryPrevious;
 	}
 }
+
+int _strncmp(const char *sz1, const char *sz2, int nMax)
+{
+	while((*sz1) && (*sz2) && nMax--) {
+	if(*sz1 != *sz2) return (*sz1 - *sz2);
+		sz1++; sz2++;
+	}
+	if(nMax==0) return 0;
+	if((*sz1) || (*sz2)) return 0;
+	return 0; // used up nMax
+}
+
+int _strncasecmp(const char *sz1, const char *sz2, int nMax)
+{
+	while((*sz1) && (*sz2) && nMax--) {
+	if(tolower(*sz1) != tolower(*sz2)) return (*sz1 - *sz2);
+		sz1++; sz2++;
+	}
+
+	if(nMax==0) return 0;
+
+	if((tolower(*sz1)) || (tolower(*sz2))) return 0;
+	return 0; // used up nMax
+}
+

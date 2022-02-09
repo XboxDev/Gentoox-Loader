@@ -16,6 +16,9 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+#include "boot.h"
+
+extern void * memcpy(void *, const void *, unsigned int);
 
 #ifdef FSYS_EXT2FS
 

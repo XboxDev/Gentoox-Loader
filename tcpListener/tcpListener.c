@@ -2,8 +2,7 @@
 #include "lwip/mem.h"
 #include "netif/etharp.h"
 #include "lwip/tcp.h"
-#include "xpad.h"
-
+#include "boot.h"
 
 struct eth_addr ethaddr= {0,0x0d,0xff,0xff,0,0};
 
@@ -77,7 +76,8 @@ ebd_wait(struct netif *netif, u16_t time)
   static unsigned long start_ticks = 0;
   extern unsigned long currticks(void);
 
-  delay_ticks = time * 3579;
+  //delay_ticks = time * 3579;
+  delay_ticks = time * 50;
   if (!start_ticks)
 	  start_ticks = currticks();
 
@@ -91,12 +91,12 @@ ebd_wait(struct netif *netif, u16_t time)
 		  q = NULL;
 		  switch (htons(ethhdr->type)) {
 		  case ETHTYPE_IP:
-			  q = etharp_ip_input(netif, p);
+			  etharp_ip_input(netif, p);
 			  pbuf_header(p, -14);
 			  netif->input(p, netif);
 			  break;
 		  case ETHTYPE_ARP:
-			  q = etharp_arp_input(netif, &ethaddr, p);
+			  etharp_arp_input(netif, &ethaddr, p);
 			  break;
 		  default:
 			  pbuf_free(p);

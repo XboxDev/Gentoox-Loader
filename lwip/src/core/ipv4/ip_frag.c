@@ -39,6 +39,7 @@
  */
 
 
+#include "boot.h"
 #include "lwip/opt.h"
 #include "lwip/sys.h"
 #include "lwip/ip.h"

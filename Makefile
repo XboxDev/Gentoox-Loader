@@ -12,11 +12,12 @@ INCLUDE = -I$(TOPDIR)/grub -I$(TOPDIR)/include -I$(TOPDIR)/ -I./ -I$(TOPDIR)/fs/
 	-I$(TOPDIR)/menu/iconmenu -I$(TOPDIR)/lwip/src/include \
 	-I$(TOPDIR)/lwip/src/include/ipv4
 
+
 #These are intended to be non-overridable.
 CROM_CFLAGS=$(INCLUDE)
 
 #You can override these if you wish.
-CFLAGS= -O2 -g -march=pentium -Werror -pipe -fomit-frame-pointer -Wstrict-prototypes -DIPv4 -fpack-struct
+CFLAGS= -O2 -g -march=pentium -pipe -fomit-frame-pointer -Wstrict-prototypes -DIPv4 -fpack-struct
 
 # add the option for gcc 3.3 only, again, non-overridable
 ifeq ($(GCC_3.3), 1)

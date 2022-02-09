@@ -12,6 +12,8 @@
 #include "BootFlash.h"
 #include <stdio.h>
 
+int sprintf(char * buf, const char *fmt, ...);
+
 // gets device ID, sets pof up accordingly
 // returns true if device okay or false for unrecognized device
 

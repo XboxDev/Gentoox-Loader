@@ -12,7 +12,6 @@
 
 #include "boot.h"
 #include "iso_fs.h"
-
 int isupper( int ch )
 {
 	return (unsigned int)(ch - 'A') < 26u;

@@ -31,6 +31,7 @@
  */
 
 
+#include "boot.h"
 #include "lwip/opt.h"
 
 #include "lwip/def.h"

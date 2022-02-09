@@ -34,6 +34,7 @@
    is not implemented. */
 
 #include "lwip/opt.h"
+#include "boot.h"
 
 #include "lwip/icmp.h"
 #include "lwip/inet.h"

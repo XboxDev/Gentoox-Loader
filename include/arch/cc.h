@@ -33,7 +33,7 @@
 #define __ARCH_CC_H__
 
 /* Include some files for defining library routines */
-#include <string.h>
+//#include <string.h>
 
 /* Define platform endianness */
 #ifndef BYTE_ORDER
