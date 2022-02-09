@@ -8,13 +8,17 @@ INCLUDE = -I$(TOPDIR)/grub -I$(TOPDIR)/include -I$(TOPDIR)/ -I./ -I$(TOPDIR)/fs/
 	-I$(TOPDIR)/drivers/video -I$(TOPDIR)/drivers/ide -I$(TOPDIR)/drivers/flash -I$(TOPDIR)/lib/misc \
 	-I$(TOPDIR)/boot_xbe/ -I$(TOPDIR)/fs/grub -I$(TOPDIR)/lib/font \
 	-I$(TOPDIR)/startuploader -I$(TOPDIR)/drivers/cpu \
-	-I$(TOPDIR)/lib/jpeg/ -I$(TOPDIR)/menu/actions -I$(TOPDIR)/menu/textmenu -I$(TOPDIR)/menu/iconmenu
+	-I$(TOPDIR)/lib/jpeg/ -I$(TOPDIR)/menu/actions -I$(TOPDIR)/menu/textmenu \
+	-I$(TOPDIR)/menu/iconmenu -I$(TOPDIR)/lwip/src/include \
+	-I$(TOPDIR)/lwip/src/include/ipv4
+
+LWIPDIR=$(TOPDIR)/lwip
 
 #These are intended to be non-overridable.
 CROM_CFLAGS=$(INCLUDE)
 
 #You can override these if you wish.
-CFLAGS= -O2 -g -mcpu=pentium -Werror -pipe -fomit-frame-pointer -Wstrict-prototypes
+CFLAGS= -O2 -g -mcpu=pentium -Werror -pipe -fomit-frame-pointer -Wstrict-prototypes -DIPv4 -fpack-struct
 
 # add the option for gcc 3.3 only, again, non-overridable
 ifeq ($(GCC_3.3), 1)
@@ -27,7 +31,7 @@ OBJCOPY = objcopy
 export CC
 
 TOPDIR  := $(shell /bin/pwd)
-SUBDIRS	= boot_rom fs drivers lib boot menu
+SUBDIRS	= boot_rom fs drivers lib boot menu lwip
 #### Etherboot specific stuff
 ifeq ($(ETHERBOOT), yes)
 ETH_SUBDIRS = etherboot
@@ -86,6 +90,7 @@ OBJECTS-CROM += $(TOPDIR)/obj/IconMenu.o
 OBJECTS-CROM += $(TOPDIR)/obj/IconMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/TextMenu.o
 OBJECTS-CROM += $(TOPDIR)/obj/TextMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/IPMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/VideoMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/ResetMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/HDDFlashMenuInit.o
@@ -99,6 +104,7 @@ OBJECTS-CROM += $(TOPDIR)/obj/VideoMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/InfoMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/ResetMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/FlashMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/IPMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/HDDMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/CDMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/LEDMenuActions.o
@@ -154,10 +160,20 @@ OBJECTS-CROM += $(TOPDIR)/obj/elf.o
 endif
 
 SUBDIRS += lwip
-OBJECTS-LWIP = $(addprefix $(TOPDIR)/obj/,mem.o memp.o netif.o pbuf.o raw.o stats.o sys.o tcp.o tcp_in.o tcp_out.o udp.o dhcp.o icmp.o ip.o inet.o ip_addr.o ip_frag.o etharp.o ebd.o webserver.o)
-#httpd.o http-pages.o)
+OBJECTS-LWIP = $(addprefix $(TOPDIR)/obj/,mem.o memp.o netif.o pbuf.o raw.o stats.o sys.o tcp.o tcp_in.o tcp_out.o udp.o dhcp.o icmp.o ip.o inet.o ip_addr.o ip_frag.o etharp.o)
 OBJECTS-CROM += $(OBJECTS-LWIP)
 
+SUBDIRS += tcpListener
+OBJECTS-TCPLISTENER = $(addprefix $(TOPDIR)/obj/,tcpListener.o)
+OBJECTS-CROM += $(OBJECTS-TCPLISTENER)
+
+SUBDIRS += webserver
+OBJECTS-WEBSERVER = $(addprefix $(TOPDIR)/obj/,webserver.o)
+OBJECTS-CROM += $(OBJECTS-WEBSERVER)
+
+SUBDIRS += webclient
+OBJECTS-WEBCLIENT = $(addprefix $(TOPDIR)/obj/,webclient.o)
+OBJECTS-CROM += $(OBJECTS-WEBCLIENT)
 
 RESOURCES = $(TOPDIR)/obj/backdrop.elf
 

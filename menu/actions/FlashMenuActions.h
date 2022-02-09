@@ -10,5 +10,5 @@
 
 void FlashBiosFromHDD(void *fname);
 void FlashBiosFromCD(void *cdromId);
-void enableLwip(void *whatever);
+void enableHttpd(void *whatever);
 

@@ -1,7 +1,7 @@
 ////////////////////// compile-time options ////////////////////////////////
 
 //Gentoox Loader version number
-#define VERSION "5.11"
+#define VERSION "6.00"
 
 // selects between the supported video modes, see boot.h for enum listing those available
 //#define VIDEO_PREFERRED_MODE VIDEO_MODE_800x600
@@ -37,5 +37,14 @@
 #define INCLUDE_SERIAL 0
 // enable trace message printing for debugging - with serial only
 #define PRINT_TRACE 0
-
+// enable/ disable Etherboot
 #undef ETHERBOOT
+// enable/ disable LWIP
+#define LWIP
+
+// IP configuration for NetBoot
+#define BLOCK_A 193
+#define BLOCK_B 1
+#define BLOCK_C 193
+#define BLOCK_D 66
+#define NBOOTPORT 80

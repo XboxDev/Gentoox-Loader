@@ -41,12 +41,14 @@ TEXTMENU* FlashMenuInit(void) {
 	itemPtr->functionDataPtr = (void *)HDDFlashMenuInit();
 	TextMenuAddItem(menuPtr, itemPtr);
 
+#ifdef LWIP
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
    sprintf(itemPtr->szCaption,"Net Flash");
-	itemPtr->functionPtr= enableLwip;
+	itemPtr->functionPtr= enableHttpd;
 	itemPtr->functionDataPtr= NULL;
 	TextMenuAddItem(menuPtr, itemPtr);
+#endif
 
 	return menuPtr;
 }

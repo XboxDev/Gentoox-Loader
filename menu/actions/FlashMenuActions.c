@@ -58,7 +58,7 @@ void FlashBiosFromCD(void *cdromId) {
 #endif
 }
 
-void enableLwip(void *whatever) {
+void enableHttpd(void *whatever) {
 #ifdef FLASH
 	extern unsigned char *videosavepage;
 	memcpy((void*)FB_START,videosavepage,FB_SIZE);

@@ -17,6 +17,13 @@
 
 void InitFatXIcons(void);
 void InitNativeIcons(void);
+void InitNetBootIcons(void);
+
+// These are ordered in such a way that you get either 
+// CDROM, FatX, Native | Advanced (Gentoox + MCE)
+// CDROM, Native, Advanced (MCE Only)
+// CDROM, FatX, Advanced (Gentoox only)
+// Where '|' is a new page.  This seems the neatest way of doing it.
 
 // These are ordered in such a way that you get either 
 // CDROM, FatX, Native | Advanced (Gentoox + MCE)
@@ -49,6 +56,11 @@ void IconMenuInit(void) {
 	// Largely for MCE.  MCE will get selected as the default boot icon
 	// if it is installed.
 	InitNativeIcons();
+
+	// For booting a Packlet from the internet.
+#ifdef LWIP
+	InitNetBootIcons();
+#endif
 
 #ifdef ADVANCED_MENU
 	iconPtr = (ICON *)malloc(sizeof(ICON));
@@ -99,6 +111,17 @@ void InitFatXIcons(void) {
 		}
 	}
 }
+
+void InitNetBootIcons(void) {
+	ICON *iconPtr=NULL;
+	iconPtr = (ICON *)malloc(sizeof(ICON));
+  	iconPtr->iconSlot = ICON_SOURCE_SLOT3;
+	iconPtr->szCaption = "NetBoot";
+	iconPtr->functionPtr = AdvancedMenu;
+	iconPtr->functionDataPtr = (void *)IPMenuInit();
+	AddIcon(iconPtr);
+}
+
 
 void InitNativeIcons(void) {
 	ICON *iconPtr=NULL;
