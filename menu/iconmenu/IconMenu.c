@@ -35,6 +35,7 @@
 ICON *firstIcon=NULL;
 ICON *selectedIcon=NULL;
 ICON *firstVisibleIcon=NULL;
+ICON *lastVisibleIcon=NULL;
 int timedOut=0;
 
 void AddIcon(ICON *newIcon) {
@@ -59,13 +60,31 @@ void AddIcon(ICON *newIcon) {
 static void IconMenuDraw(int nXOffset, int nYOffset) {
 	ICON *iconPtr;
 	int iconcount;
-	
+	u8 opaqueness;
+
 	if (firstVisibleIcon==NULL) firstVisibleIcon = firstIcon;
 	if (selectedIcon==NULL) selectedIcon = firstIcon;
 	iconPtr = firstVisibleIcon;
+
+	if(firstVisibleIcon->previousIcon != NULL) {
+		opaqueness = SELECTED;
+	} else {
+		opaqueness = TRANSPARENTNESS;
+	}
+	
+	BootVideoJpegBlitBlend(
+		(u8 *)(FB_START+((vmode.width * (nYOffset-74))+nXOffset+(50)) * 4),
+		vmode.width, // dest bytes per line
+		&jpegBackdrop, // source jpeg object
+		(u8 *)(jpegBackdrop.pData+(ICON_WIDTH*5 * jpegBackdrop.bpp)),
+		0xff00ff|(((u32)opaqueness)<<24),
+		(u8 *)(jpegBackdrop.pBackdrop + ((jpegBackdrop.width * (nYOffset-74)) + nXOffset+(50)) * jpegBackdrop.bpp),
+		ICON_WIDTH, ICON_HEIGHT
+	);
+
+
 	//There are max 3 (three) 'bays' for displaying icons in - we only draw the 3.
 	for (iconcount=0; iconcount<3; iconcount++) {
-		u8 opaqueness;
 		if (iconPtr==NULL) {
 			//No more icons to draw
 			return;
@@ -90,22 +109,39 @@ static void IconMenuDraw(int nXOffset, int nYOffset) {
 			(u8 *)(jpegBackdrop.pBackdrop + ((jpegBackdrop.width * (nYOffset-74)) + nXOffset+(140*(iconcount+1))) * jpegBackdrop.bpp),
 			ICON_WIDTH, ICON_HEIGHT
 		);
+		lastVisibleIcon = iconPtr;
 		iconPtr = iconPtr->nextIcon;
 	}
+
+	if(lastVisibleIcon->nextIcon != NULL) {
+		opaqueness = SELECTED;
+	} else {
+		opaqueness = TRANSPARENTNESS;
+	}
+
+	BootVideoJpegBlitBlend(
+		(u8 *)(FB_START+((vmode.width * (nYOffset-74))+nXOffset+(510)) * 4),
+		vmode.width, // dest bytes per line
+		&jpegBackdrop, // source jpeg object
+		(u8 *)(jpegBackdrop.pData+(ICON_WIDTH*6 * jpegBackdrop.bpp)),
+		0xff00ff|(((u32)opaqueness)<<24),
+		(u8 *)(jpegBackdrop.pBackdrop + ((jpegBackdrop.width * (nYOffset-74)) + nXOffset+(510)) * jpegBackdrop.bpp),
+		ICON_WIDTH, ICON_HEIGHT
+	);
+
 }
 
 void IconMenu(void) {
-        unsigned char *videosavepage;
+	unsigned char *videosavepage;
         
-        u32 COUNT_start;
-        u32 temp=1;
+	u32 COUNT_start;
+	u32 temp=1;
 	ICON *iconPtr=NULL;
 
 	extern int nTempCursorMbrX, nTempCursorMbrY; 
 	int nTempCursorResumeX, nTempCursorResumeY ;
 	int nTempCursorX, nTempCursorY;
 	int nModeDependentOffset=(vmode.width-640)/2;  
-
 	
 	nTempCursorResumeX=nTempCursorMbrX;
 	nTempCursorResumeY=nTempCursorMbrY;
@@ -141,7 +177,7 @@ void IconMenu(void) {
 			if (selectedIcon->nextIcon!=NULL) {
 				//A bit ugly, but need to find the last visible icon, and see if 
 				//we are moving further right from it.
-				ICON *lastVisibleIcon=firstVisibleIcon;
+				lastVisibleIcon=firstVisibleIcon;
 				int i=0;
 				for (i=0; i<2; i++) {
 					if (lastVisibleIcon->nextIcon==NULL) {
