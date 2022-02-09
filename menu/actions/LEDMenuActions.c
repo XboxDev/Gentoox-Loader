@@ -84,9 +84,9 @@ void LEDLow(void *whatever) {
 }
 
 void LEDHeader(char *name, char *pattern) {
-	printk("\n\n\n\n\n        ");
-	printk("This is what the '%s' pattern looks like throughout Gentoox\n\n        ", name);
-	printk("It's sequence is '%s'.\n\n        ", pattern);
+	printk("\n\n\n\n\n           ");
+	printk("This is what the '%s' pattern looks like throughout Gentoox\n\n           ", name);
+	printk("It's sequence is '%s'.\n\n           ", pattern);
 	printk("Press Button 'A' to continue.");
 }
 	

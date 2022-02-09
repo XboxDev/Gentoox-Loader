@@ -37,6 +37,9 @@ ICON *selectedIcon=NULL;
 ICON *firstVisibleIcon=NULL;
 ICON *lastVisibleIcon=NULL;
 int timedOut=0;
+unsigned char *videosavepage;
+
+
 
 void AddIcon(ICON *newIcon) {
 	ICON *iconPtr = firstIcon;
@@ -128,7 +131,6 @@ static void IconMenuDraw(int nXOffset, int nYOffset) {
 }
 
 void IconMenu(void) {
-	unsigned char *videosavepage;
         
 	u32 COUNT_start;
 	u32 temp=1;

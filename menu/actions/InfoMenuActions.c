@@ -24,11 +24,16 @@ void ShowTemperature(void *whatever) {
 		VIDEO_ATTR=0xffc8c8c8;
 		printk("CPU temperature: ");
 		VIDEO_ATTR=0xffc8c800;
-		printk("%d°C / %d°F\n        ", c, f);
+		printk("%d°C / %d°F\n           ", c, f);
 		VIDEO_ATTR=0xffc8c8c8;
 		printk("Board temperature: ");
 		VIDEO_ATTR=0xffc8c800;
 		printk("%d°C / %d°F", cx, fx);
+	} else {
+		VIDEO_ATTR=0xffff0000;
+      printk("Error getting temperatures!  ");
+		VIDEO_ATTR=0xffc8c8c8;
+		printk("This does not work on Xbox v1.6+.");
 	}
 	InfoFooter();
 }
@@ -53,15 +58,14 @@ void ShowEeprom(void *whatever) {
 }
 
 void InfoHeader(char *title) {
-	printk("\n\n\n\n\n        ");
+	printk("\n\n\n\n\n           ");
 	VIDEO_ATTR=0xffffef37;
-	printk("\2%s information:\2\n\n\n\n\n\n\n\n        ", title);
+	printk("\2%s information:\2\n\n\n\n\n\n\n\n           ", title);
 	VIDEO_ATTR=0xffc8c8c8;
 }
 
 void InfoFooter(void) {
 	VIDEO_ATTR=0xffc8c8c8;
-	printk("\n\n        Press Button 'A' to continue.");
+	printk("\n\n           Press Button 'A' to continue.");
 	while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(100);
 }
-

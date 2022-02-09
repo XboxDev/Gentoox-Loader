@@ -113,28 +113,40 @@ extern void BootResetAction ( void ) {
 
 	I2CTransmitWord(0x10, 0x1901); // no reset on eject
          
+	VIDEO_CURSOR_POSX=(vmode.xmargin/*+64*/)*4;
 	VIDEO_CURSOR_POSY=vmode.ymargin;
-	VIDEO_CURSOR_POSX=(vmode.xmargin/*+64*/)*4;
 
-	if (cromwell_config==XROMWELL)  printk("\2Gentoox Loader (XBE) v" VERSION "\n\n\2");
-	if (cromwell_config==CROMWELL)  printk("\2Gentoox Loader (ROM) v" VERSION "\n\n\2");
+	printk("\n\n");
+	if (cromwell_config==XROMWELL) {
+		printk("           \2Gentoox Loader (XBE) v" VERSION "\n\n\2");
+	} else if (cromwell_config==CROMWELL) {
+		printk("           \2Gentoox Loader (ROM) v" VERSION "\n\n\2");
+	}
 
-	VIDEO_CURSOR_POSY=vmode.ymargin+32;
+	VIDEO_ATTR=0xff00ff00;
+
 	VIDEO_CURSOR_POSX=(vmode.xmargin/*+64*/)*4;
-	printk("Gentoox (c) ShALLaX - http://gentoox.shallax.com - ");
+	VIDEO_CURSOR_POSY=vmode.ymargin+64;
+
+	
+	VIDEO_ATTR=0xff00ff00;
+	printk("           Gentoox");
+	VIDEO_ATTR=0xffc8c8c8;
+	printk(" (c) ShALLaX - http://gentoox.shallax.com - ");
+
 	if (xbox_ram > 64) {
 		VIDEO_ATTR=0xff00ff00;
 	} else {
 		VIDEO_ATTR=0xffffa20f;
 	}
    printk("RAM: %d", xbox_ram);
-   printk("MB   \n");
+   printk("MiB\n");
    
 	VIDEO_CURSOR_POSX=(vmode.xmargin/*+64*/)*4;
 #ifndef SILENT_MODE	
 	// capture title area
 	VIDEO_ATTR=0xffc8c8c8;
-	printk("Encoder: ");
+	printk("           Encoder: ");
 	VIDEO_ATTR=0xffc8c800;
 	printk("%s  ", VideoEncoderName());
 	VIDEO_ATTR=0xffc8c8c8;
@@ -179,26 +191,26 @@ extern void BootResetAction ( void ) {
 		of.m_pbMemoryMappedStartAddress=(u8 *)LPCFlashadress;
 		BootFlashGetDescriptor(&of, (KNOWN_FLASH_TYPE *)&aknownflashtypesDefault[0]);
 		VIDEO_ATTR=0xffc8c8c8;
-		printk("Flash type: ");
+		printk("           Flash type: ");
 		VIDEO_ATTR=0xffc8c800;
 		printk("%s\n", of.m_szFlashDescription);
 	}
 #endif
 */
 #ifndef SILENT_MODE
-	printk("BOOT: start USB init\n");
+	printk("           BOOT: start USB init\n");
 #endif
 	BootStartUSB();
 
 	// init the IDE devices
 #ifndef SILENT_MODE
 	VIDEO_ATTR=0xffc8c8c8;
-	printk("Initializing IDE Controller\n");
+	printk("           Initializing IDE Controller\n");
 #endif
 	BootIdeWaitNotBusy(0x1f0);
        	wait_ms(200);
 #ifndef SILENT_MODE
-	printk("Ready\n");
+	printk("           Ready\n");
 #endif	
 	// reuse BIOS status area
 

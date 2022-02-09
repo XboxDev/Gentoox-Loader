@@ -33,8 +33,10 @@ void BootFromCD(void *data) {
 	int nTempCursorY = VIDEO_CURSOR_POSY; 
 	CONFIGENTRY *config = LoadConfigCD(*(int*)data);
 	if (config==NULL) {
-		printk("\n\nCould not boot Stardust!\nTry different media and a lower burning speed.\n");
+		errorLED();
+		printk("\n\n           Could not boot from disc!\n           Try different media and a lower burning speed.\n");
 		wait_ms(5000);
+		inputLED();
 		//Clear the screen and return to the menu
 		BootVideoClearScreen(&jpegBackdrop, nTempCursorY, VIDEO_CURSOR_POSY+1);	
 		return;
@@ -98,6 +100,11 @@ void DrawBootMenu(void *rootEntry) {
 
 void BootMenuEntry(void *entry) {
 	CONFIGENTRY *config = (CONFIGENTRY*)entry;
+	if (!(config->nextConfigEntry==NULL) || !(config->previousConfigEntry==NULL)) {
+		extern unsigned char *videosavepage;
+		memcpy((void*)FB_START,videosavepage,FB_SIZE);
+	}
+
 	switch (config->bootType) {
 		case BOOT_CDROM:
 			LoadKernelCdrom(config);

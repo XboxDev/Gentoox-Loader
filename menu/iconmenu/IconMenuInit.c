@@ -31,7 +31,7 @@ void IconMenuInit(void) {
 		//Add the cdrom icon - if you have two cdroms, you'll get two icons!
 		if (tsaHarddiskInfo[i].m_fAtapi) {
 			char *driveName=malloc(sizeof(char)*14);
-			sprintf(driveName,"Stardust");
+			sprintf(driveName,"CD/DVD");
 			iconPtr = (ICON *)malloc(sizeof(ICON));
 			iconPtr->iconSlot = ICON_SOURCE_SLOT2;
 			iconPtr->szCaption = driveName;
@@ -87,11 +87,11 @@ void InitFatXIcons(void) {
 			if (entry !=NULL) {
 				//There is a config file present.
 				iconPtr = (ICON *)malloc(sizeof(ICON));
-		   		iconPtr->iconSlot = ICON_SOURCE_SLOT4;
+		   	iconPtr->iconSlot = ICON_SOURCE_SLOT4;
 				iconPtr->szCaption="   FatX";
 				iconPtr->functionPtr = DrawBootMenu;
 				iconPtr->functionDataPtr = (void *)entry;
-		   		AddIcon(iconPtr);
+				AddIcon(iconPtr);
 				//If we have fatx, mark it as default.
 				//If there are natives, they'll get priority shortly
 				selectedIcon = iconPtr;

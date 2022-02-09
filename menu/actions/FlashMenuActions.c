@@ -32,7 +32,7 @@ void FlashBiosFromHDD(void *fname) {
 	FATXFILEINFO fileinfo;
 	res = LoadFATXFilefixed(partition, fname, &fileinfo, (char*)0x100000);
 	if (!res) {
-		printk("\n\n\n\n\n        Loading BIOS failed");
+		printk("\n\n\n\n\n           Loading BIOS failed");
 		dots();
 		cromwellError();
 		while(1);
@@ -42,7 +42,7 @@ void FlashBiosFromHDD(void *fname) {
 
 	res = BootReflashAndReset((char*)0x100000,offset,fileinfo.fileSize);
 
-	printk("\n\n\n\n\n        Flash failed");
+	printk("\n\n\n\n\n           Flash failed");
    CloseFATXPartition(partition);
 	dots();
 	cromwellError();
@@ -52,14 +52,18 @@ void FlashBiosFromHDD(void *fname) {
 
 void FlashBiosFromCD(void *cdromId) {
 #ifdef FLASH
+	extern unsigned char *videosavepage;
+	memcpy((void*)FB_START,videosavepage,FB_SIZE);
 	BootLoadFlashCD(*(int *)cdromId);
 #endif
 }
 
 void enableLwip(void *whatever) {
 #ifdef FLASH
+	extern unsigned char *videosavepage;
+	memcpy((void*)FB_START,videosavepage,FB_SIZE);
 	VIDEO_ATTR=0xffef37;
-	printk("\n\n\n\n\n        \2Net Flash\2\n\n\n");
+	printk("\n\n\n\n\n\n");
 	VIDEO_ATTR=0xffc8c8c8;
 	initialiseNetwork();
 	netflash();
