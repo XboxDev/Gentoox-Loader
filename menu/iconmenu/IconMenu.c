@@ -227,6 +227,7 @@ void IconMenu(void) {
 					//As all the icons have moved, we need to refresh the entire page.
 					memcpy((void*)FB_START,videosavepage,FB_SIZE);
 				}
+				memcpy((void*)FB_START,videosavepage,FB_SIZE);
 				selectedIcon = selectedIcon->previousIcon;
 				changed=1;
 			}

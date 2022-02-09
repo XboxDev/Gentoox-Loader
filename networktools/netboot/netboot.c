@@ -31,11 +31,9 @@
  */
 
 #include "boot.h"
-
 #include "lwip/debug.h"
 #include "lwip/stats.h"
 #include "lwip/tcp.h"
-
 #include "memory_layout.h"
 #include <shared.h>
 
@@ -81,7 +79,7 @@ static char http_file4[] =
 #include "webContent/booting.html.h"
 ;
 
-static char http_file5[] = 
+static char http_file5[] =
 #include "webContent/gentoox.png.h"
 ;
 

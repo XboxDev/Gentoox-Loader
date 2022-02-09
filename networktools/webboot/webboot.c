@@ -44,19 +44,14 @@ static err_t recvKernel(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t er
 static err_t recvInitrd(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err);
 static err_t recvAppend(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err);
 static void connErr(void *arg, err_t err);
-static int isdigit(char c);
-void boot(void);
-void processHeader(void);
+static void boot(void);
+static void processHeader(void);
 extern char *finalURL;
 extern char *finalKernelPath;
 extern char *finalInitrdPath;
 extern char *finalAppendPath;
 
-static int isdigit(char c) {
-	return ((c) >= '0' && (c) <= '9');
-}
-
-void processHeader() {
+static void processHeader() {
 	char *headerPtr = strstr(header, "Content-Length");
 	if(headerPtr != NULL) {
 		headerPtr+=16;
@@ -74,11 +69,11 @@ static void connErr(void *arg, err_t err) {
 	printk("\n           Connection error...");
 	cromwellError();
 	printk("\n");
-//	while(1);
+	while(1);
 }
 
 // Boot the system.
-void boot() {
+static void boot() {
 	free(requestGET);
 	free(requestHEAD);
 	eth_disable();
@@ -412,9 +407,7 @@ void webboot_init(int A, int B, int C, int D, int P) {
 
 	memset(tempBuf, 0, 15*1024*1024);
 
-	// HEANET
-	//IP4_ADDR(&ipaddr, 193,1,193,66);
-	// Custom
+	// Set the IP.
 	IP4_ADDR(&ipaddr, A,B,C,D);
 	port = (u16_t)P;
 
