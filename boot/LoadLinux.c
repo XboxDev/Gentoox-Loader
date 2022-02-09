@@ -174,7 +174,8 @@ int LoadKernelNative(CONFIGENTRY *config) {
 	I2CTransmitWord(0x10, 0x0c01); // Close DVD tray
 	printk("Boot: Loading kernel '%s'", config->szKernel);
 	dots();
-        strncpy(&szGrub[4], config->szKernel,strlen(config->szKernel));
+
+	strncpy(&szGrub[4], config->szKernel,strlen(config->szKernel));
 
 	nRet=grub_open(szGrub);
 
@@ -199,16 +200,19 @@ int LoadKernelNative(CONFIGENTRY *config) {
 		VIDEO_ATTR=0xffa8a8a8;
  		strncpy(&szGrub[4], config->szInitrd,sizeof(config->szInitrd));
 		nRet=grub_open(szGrub);
+
 		if(filemax==0) {
 			//printf("Empty file\n"); 
 			cromwellError();
 			while(1);
 		}
+
 		if( (nRet!=1) || (errnum)) {
 			cromwellError();
 			//printk("Unable to load initrd, Grub error %d\n", errnum);
 			while(1);
 		}
+
 		//printk(" - %d bytes\n", filemax);
 		cromwellSuccess();
 		dwInitrdSize=grub_read((void*)INITRD_START, MAX_INITRD_SIZE);
@@ -293,7 +297,7 @@ int LoadKernelFatX(CONFIGENTRY *config) {
 		dwKernelSize = infokernel.fileSize;
 		// moving the kernel to its final location
 		memPlaceKernel(tempBuf, dwKernelSize);
-		
+		cromwellSuccess();
 		//printk(" -  %d bytes...\n", infokernel.fileRead);
 	}
 
@@ -307,8 +311,8 @@ int LoadKernelFatX(CONFIGENTRY *config) {
 			cromwellError();
 			while(1);
 		}
-		cromwellSuccess();
 		dwInitrdSize = infoinitrd.fileSize;
+		cromwellSuccess();
 		//printk(" - %d %d bytes\n", dwInitrdSize,infoinitrd.fileRead);
 	} else {
 		cromwellError();

@@ -60,13 +60,13 @@ void lowLED(void) {
 }
 
 void dots(void) {
-   wait_ms(333);
+   wait_ms(100);
    printk(".");
-   wait_ms(333);
+   wait_ms(100);
    printk(".");
-   wait_ms(333);
+   wait_ms(100);
    printk(".");
-   wait_ms(333);
+   wait_ms(100);
 }
 
 void cromwellError(void) {
