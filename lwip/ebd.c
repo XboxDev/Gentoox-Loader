@@ -145,8 +145,6 @@ int run_lwip(void)
 	tcp_init();
 	etharp_init();
 	cromwellSuccess();
-	printk("\n        Hold Button 'B' to abort.\n\n");
-
 	printk("        Waiting for IP");
 	dots();
 	printk(" ");
@@ -171,7 +169,6 @@ int run_lwip(void)
    int divisor = 0;
 	int first = 1;
 	while (1) {
-		if((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_B) == 1)) return 0;		
 		if (!ebd_wait(&netif, TCP_TMR_INTERVAL)) {
 			if (divisor++ == 60 * 4) {
 				if (first && netif.dhcp->state != DHCP_BOUND) {

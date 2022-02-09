@@ -120,6 +120,7 @@ void DrawChildTextMenu(void *menu) {
 extern int etherboot(void);
 void BootFromEtherboot(void *data) {
 	busyLED();
+	initialiseNetwork();
 	etherboot();
 }
 #endif
