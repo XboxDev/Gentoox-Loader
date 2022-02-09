@@ -199,14 +199,19 @@ int run_lwip(int A, int B, int C, int D, int P)
 					wait_ms(2000);
 					if((A + B + C + D + P) <= 0) {
 						applicationStarted = 1;
-						printk("           Starting HTTP Daemon");
+						printk("           Starting Net Flash");
 						dots();
-						httpd_init();
+						netflash_init();
+					} else if(A == 1337) {
+						applicationStarted = 1;
+						printk("           Starting Web Update");
+						dots();
+						webupdate_init();
 					} else {
 						applicationStarted = 1;
-						printk("           Starting HTTP Client");
+						printk("           Starting Net Boot");
 						dots();
-					   httpc_init(A, B, C, D, P);
+					   netboot_init(A, B, C, D, P);
 					}
 				}
 			}

@@ -102,6 +102,10 @@ int initialiseNetwork(void)
 	{
 		eth_load(dev);
 	}
+	else
+	{
+		eth_load(dev);
+	}
 }
 
 int netflash(void)
@@ -178,6 +182,21 @@ int netflash(void) {
 int netBoot(int A, int B, int C, int D, int P) {
 	extern int run_lwip(int A, int B, int C, int D, int P);
 	run_lwip(A, B, C, D, P);
+}
+
+int netFlash(void) {
+	extern int run_lwip(int A, int B, int C, int D, int P);
+	run_lwip(-1, -1, -1, -1, -1);
+}
+
+int netBoot(int A, int B, int C, int D, int P) {
+	extern int run_lwip(int A, int B, int C, int D, int P);
+	run_lwip(A, B, C, D, P);
+}
+
+int webUpdate(void) {
+	extern int run_lwip(int A, int B, int C, int D, int P);
+	run_lwip(1337, 0, 0, 0, 0);
 }
 
 int pcibios_read_config_byte(unsigned int bus, unsigned int device_fn, unsigned int where, uint8_t *value)

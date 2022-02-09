@@ -22,11 +22,19 @@ TEXTMENU *IPMenuInit(void) {
 	menuPtr = malloc(sizeof(TEXTMENU));
 	strcpy(menuPtr->szCaption, "IP:Port Selection (A.B.C.D:P)");
 	menuPtr->firstMenuItem=NULL;
+
+	// Connect
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+	strcpy(itemPtr->szCaption, "Connect");
+	itemPtr->functionPtr= enableHttpc;
+	itemPtr->functionDataPtr = NULL ;
+	TextMenuAddItem(menuPtr, itemPtr);
 	
 	// A
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	sprintf(itemPtr->szCaption, "%s %i", "A: ", BLOCK_A);
+	sprintf(itemPtr->szCaption, "%s %i", "A: ", NB_BLOCK_A);
 	itemPtr->functionPtr=incrementNumberA;
 	itemPtr->functionDataPtr = itemPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
@@ -34,7 +42,7 @@ TEXTMENU *IPMenuInit(void) {
 	// B
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	sprintf(itemPtr->szCaption, "%s %i", "B: ", BLOCK_B);
+	sprintf(itemPtr->szCaption, "%s %i", "B: ", NB_BLOCK_B);
 	itemPtr->functionPtr=incrementNumberB;
 	itemPtr->functionDataPtr = itemPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
@@ -42,7 +50,7 @@ TEXTMENU *IPMenuInit(void) {
 	// C
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	sprintf(itemPtr->szCaption, "%s %i", "C: ", BLOCK_C);
+	sprintf(itemPtr->szCaption, "%s %i", "C: ", NB_BLOCK_C);
 	itemPtr->functionPtr=incrementNumberC;
 	itemPtr->functionDataPtr = itemPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
@@ -50,7 +58,7 @@ TEXTMENU *IPMenuInit(void) {
 	// D
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	sprintf(itemPtr->szCaption, "%s %i", "D: ", BLOCK_D);
+	sprintf(itemPtr->szCaption, "%s %i", "D: ", NB_BLOCK_D);
 	itemPtr->functionPtr=incrementNumberD;
 	itemPtr->functionDataPtr = itemPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
@@ -58,17 +66,10 @@ TEXTMENU *IPMenuInit(void) {
 	// P
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	sprintf(itemPtr->szCaption, "%s %i", "P: ", NBOOTPORT);
+	sprintf(itemPtr->szCaption, "%s %i", "P: ", NB_PORT);
 	itemPtr->functionPtr=incrementNumberP;
 	itemPtr->functionDataPtr = itemPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 
-	// Confirm
-	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
-	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "Connect");
-	itemPtr->functionPtr= enableHttpc;
-	itemPtr->functionDataPtr = NULL ;
-	TextMenuAddItem(menuPtr, itemPtr);
 	return menuPtr;
 }

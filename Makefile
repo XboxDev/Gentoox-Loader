@@ -127,6 +127,7 @@ OBJECTS-CROM += $(TOPDIR)/obj/BootFlashUi.o
 OBJECTS-CROM += $(TOPDIR)/obj/BootEEPROM.o
 OBJECTS-CROM += $(TOPDIR)/obj/BootParser.o
 OBJECTS-CROM += $(TOPDIR)/obj/BootFATX.o
+OBJECTS-CROM += $(TOPDIR)/obj/ProgressBar.o
 #USB
 OBJECTS-CROM += $(TOPDIR)/obj/config.o 
 OBJECTS-CROM += $(TOPDIR)/obj/hcd-pci.o
@@ -159,21 +160,9 @@ OBJECTS-CROM += $(TOPDIR)/obj/xbox_main.o
 OBJECTS-CROM += $(TOPDIR)/obj/elf.o
 endif
 
-SUBDIRS += lwip
-OBJECTS-LWIP = $(addprefix $(TOPDIR)/obj/,mem.o memp.o netif.o pbuf.o raw.o stats.o sys.o tcp.o tcp_in.o tcp_out.o udp.o dhcp.o icmp.o ip.o inet.o ip_addr.o ip_frag.o etharp.o)
+SUBDIRS += lwip tcpListener networktools
+OBJECTS-LWIP = $(addprefix $(TOPDIR)/obj/,mem.o memp.o netif.o pbuf.o raw.o stats.o sys.o tcp.o tcp_in.o tcp_out.o udp.o dhcp.o icmp.o ip.o inet.o ip_addr.o ip_frag.o etharp.o tcpListener.o netflash.o netboot.o webupdate.o)
 OBJECTS-CROM += $(OBJECTS-LWIP)
-
-SUBDIRS += tcpListener
-OBJECTS-TCPLISTENER = $(addprefix $(TOPDIR)/obj/,tcpListener.o)
-OBJECTS-CROM += $(OBJECTS-TCPLISTENER)
-
-SUBDIRS += webserver
-OBJECTS-WEBSERVER = $(addprefix $(TOPDIR)/obj/,webserver.o)
-OBJECTS-CROM += $(OBJECTS-WEBSERVER)
-
-SUBDIRS += webclient
-OBJECTS-WEBCLIENT = $(addprefix $(TOPDIR)/obj/,webclient.o)
-OBJECTS-CROM += $(OBJECTS-WEBCLIENT)
 
 RESOURCES = $(TOPDIR)/obj/backdrop.elf
 

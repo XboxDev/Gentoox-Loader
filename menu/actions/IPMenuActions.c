@@ -9,7 +9,7 @@
 #include "IPMenuActions.h"
 #include "TextMenu.h"
 
-int A = BLOCK_A, B = BLOCK_B, C = BLOCK_C, D = BLOCK_D, nP = NBOOTPORT;
+static int A = NB_BLOCK_A, B = NB_BLOCK_B, C = NB_BLOCK_C, D = NB_BLOCK_D, P = NB_PORT;
 
 void enableHttpc(void *whatever) {
 	extern unsigned char *videosavepage;
@@ -18,7 +18,7 @@ void enableHttpc(void *whatever) {
 	printk("\n\n\n\n\n\n");
 	VIDEO_ATTR=0xffc8c8c8;
 	initialiseNetwork();
-	netBoot(A, B, C, D, nP);
+	netBoot(A, B, C, D, P);
 }
 
 void incrementNumberA(void *num) {
@@ -72,6 +72,6 @@ void incrementNumberP(void *num) {
 	if(n > 65535) {
 		n = 1;
 	}
-	nP = n;
+	P = n;
 	sprintf(text, "%s %i", "P: ", n);
 }

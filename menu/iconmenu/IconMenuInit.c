@@ -19,18 +19,6 @@ void InitFatXIcons(void);
 void InitNativeIcons(void);
 void InitNetBootIcons(void);
 
-// These are ordered in such a way that you get either 
-// CDROM, FatX, Native | Advanced (Gentoox + MCE)
-// CDROM, Native, Advanced (MCE Only)
-// CDROM, FatX, Advanced (Gentoox only)
-// Where '|' is a new page.  This seems the neatest way of doing it.
-
-// These are ordered in such a way that you get either 
-// CDROM, FatX, Native | Advanced (Gentoox + MCE)
-// CDROM, Native, Advanced (MCE Only)
-// CDROM, FatX, Advanced (Gentoox only)
-// Where '|' is a new page.  This seems the neatest way of doing it.
-
 void IconMenuInit(void) {
 	int i=0;
 	ICON *iconPtr=NULL;

@@ -58,7 +58,7 @@ void FlashBiosFromCD(void *cdromId) {
 #endif
 }
 
-void enableHttpd(void *whatever) {
+void enableNetflash(void *whatever) {
 #ifdef FLASH
 	extern unsigned char *videosavepage;
 	memcpy((void*)FB_START,videosavepage,FB_SIZE);
@@ -66,6 +66,19 @@ void enableHttpd(void *whatever) {
 	printk("\n\n\n\n\n\n");
 	VIDEO_ATTR=0xffc8c8c8;
 	initialiseNetwork();
-	netflash();
+	netFlash();
 #endif
 }
+
+void enableWebupdate(void *whatever) {
+#ifdef FLASH
+	extern unsigned char *videosavepage;
+	memcpy((void*)FB_START,videosavepage,FB_SIZE);
+	VIDEO_ATTR=0xffef37;
+	printk("\n\n\n\n\n\n");
+	VIDEO_ATTR=0xffc8c8c8;
+	initialiseNetwork();
+	webUpdate();
+#endif
+}
+

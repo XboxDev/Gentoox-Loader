@@ -10,5 +10,7 @@
 
 void FlashBiosFromHDD(void *fname);
 void FlashBiosFromCD(void *cdromId);
-void enableHttpd(void *whatever);
+
+void enableNetflash(void *whatever);
+void enableWebupdate(void *whatever);
 
