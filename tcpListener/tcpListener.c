@@ -7,7 +7,6 @@
 
 struct eth_addr ethaddr= {0,0x0d,0xff,0xff,0,0};
 
-extern void dots(void);
 extern void cromwellSuccess(void);
 
 void eth_transmit(const char *d, unsigned int t, unsigned int s, const void *p);
@@ -138,8 +137,7 @@ int run_lwip(int A, int B, int C, int D, int P)
 	struct ip_addr ipaddr, netmask, gw;
 	struct netif netif;
 	busyLED();
-	printk("           Initialising TCP/IP");
-	dots();
+	printk("           Initialising TCP/IP...");
 	mem_init();
 	memp_init();
 	pbuf_init(); 
@@ -149,8 +147,7 @@ int run_lwip(int A, int B, int C, int D, int P)
 	tcp_init();
 	etharp_init();
 	cromwellSuccess();
-	printk("           Waiting for IP");
-	dots();
+	printk("           Waiting for IP...");
 	printk(" ");
 	applicationStarted = 0;
 	gotIP = 0;
@@ -210,23 +207,19 @@ int run_lwip(int A, int B, int C, int D, int P)
 					wait_ms(2000);
 					if(A == 1336) {
 						applicationStarted = 1;
-						printk("           Starting Net Flash");
-						dots();
+						printk("           Starting Net Flash...");
 						netflash_init();
 					} else if(A == 1337) {
 						applicationStarted = 1;
-						printk("           Starting Web Update");
-						dots();
+						printk("           Starting Web Update...");
 						webupdate_init();
 					} else if(A == 1338) {
 						applicationStarted = 1;
-						printk("           Starting Net Boot");
-						dots();
+						printk("           Starting Net Boot...");
 						netboot_init();
 					} else {
 						applicationStarted = 1;
-						printk("           Starting Web Boot");
-						dots();
+						printk("           Starting Web Boot...");
 					   webboot_init(A, B, C, D, P);
 					}
 				}

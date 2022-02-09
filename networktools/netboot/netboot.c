@@ -104,34 +104,20 @@ static struct http_file http_files[8]={
 	{sizeof (http_file500) - 1, http_file500},   /* 6 */
 };
 
-/*-----------------------------------------------------------------------------------*/
-/*static void conn_err(void *arg, err_t err) {
-	printk("\n           Connection error");
-	dots();
-	cromwellError();
-	printk("\n");
-	while(1);
-}
-*/
-
-static void
-conn_err(void *arg, err_t err)
-{
+static void conn_err(void *arg, err_t err) {
   struct http_state *hs;
 
   hs = arg;
   mem_free(hs);
 }
 
-/*-----------------------------------------------------------------------------------*/
-static void
-close_conn(struct tcp_pcb *pcb, struct http_state *hs)
-{
+static void close_conn(struct tcp_pcb *pcb, struct http_state *hs) {
   tcp_arg(pcb, NULL);
   tcp_sent(pcb, NULL);
   tcp_recv(pcb, NULL);
   if(hs->data_start) {
 		if(postNum == 1) {
+			inputLED();
 			cromwellSuccess();
 //			printk("           Got Kernel: %i\n", hs->data_len);
 			memPlaceKernel(hs->data_start, hs->data_len);
@@ -141,18 +127,20 @@ close_conn(struct tcp_pcb *pcb, struct http_state *hs)
 			} else {
 				printk("\t[ skipped ]\n");
 			}
+			inputLED();
 //			printk("           Got Initrd: %i\n", hs->data_len);
 			initrdSize = hs->data_len;
 			memcpy((u8*)INITRD_START, hs->data_start, hs->data_len);
 		} else if(postNum == 3) {
 			cromwellSuccess();
+			goodLED();
 //			printk("           Got Append: %i\n", hs->data_len);
 			char *append = (char*)malloc(hs->data_len+1);
 			memset(append, 0, hs->data_len+1);
 			memcpy(append, hs->data_start, hs->data_len);
 //			printk("%s", append);
 			eth_disable();
-			ExittoLinuxPacklet(initrdSize, append);
+			ExittoLinuxFromNet(initrdSize, append);
 			while(1);
 		}
 		hs->data_start = NULL;
@@ -166,10 +154,8 @@ close_conn(struct tcp_pcb *pcb, struct http_state *hs)
   mem_free(hs);
   tcp_close(pcb);
 }
-/*-----------------------------------------------------------------------------------*/
-static void
-send_data(struct tcp_pcb *pcb, struct http_state *hs)
-{
+
+static void send_data(struct tcp_pcb *pcb, struct http_state *hs) {
   err_t err;
   u16_t len;
 
@@ -195,10 +181,8 @@ send_data(struct tcp_pcb *pcb, struct http_state *hs)
 	printf("send_data: error %s len %d %d\n", lwip_strerr(err), len, tcp_sndbuf(pcb));*/
   }
 }
-/*-----------------------------------------------------------------------------------*/
-static err_t
-http_poll(void *arg, struct tcp_pcb *pcb)
-{
+
+static err_t http_poll(void *arg, struct tcp_pcb *pcb) {
   struct http_state *hs;
 
   hs = arg;
@@ -220,10 +204,8 @@ http_poll(void *arg, struct tcp_pcb *pcb)
 
   return ERR_OK;
 }
-/*-----------------------------------------------------------------------------------*/
-static err_t
-http_sent(void *arg, struct tcp_pcb *pcb, u16_t len)
-{
+
+static err_t http_sent(void *arg, struct tcp_pcb *pcb, u16_t len) {
   struct http_state *hs;
 
   hs = arg;
@@ -239,10 +221,7 @@ http_sent(void *arg, struct tcp_pcb *pcb, u16_t len)
   return ERR_OK;
 }
 
-
-static int
-handle_line(struct tcp_pcb *pcb, struct http_state *hs)
-{
+static int handle_line(struct tcp_pcb *pcb, struct http_state *hs) {
 	if (!hs->gotfirst) {
 		if (strncmp (hs->lineBuf, "GET /", 4) == 0) {
 			unsigned long fno = simple_strtoul (&hs->lineBuf[5], NULL, NULL);
@@ -289,21 +268,7 @@ handle_line(struct tcp_pcb *pcb, struct http_state *hs)
 	return 1;
 }
 
-static char * xstrstr(const char * s1, const char * s2)
-{
-	int l1, l2;
-
-	l2 = strlen(s2);
-	if (!l2)
-		return (char *) s1;
-	l1 = strlen(s1);
-
-	return NULL;
-}
-
-static int
-handle_post(struct http_state *hs)
-{
+static int handle_post(struct http_state *hs) {
 	int i, ncnt = 0, blen, len;
 	char *start, *end;
 	char *boundary = NULL;
@@ -360,10 +325,8 @@ handle_post(struct http_state *hs)
 
 	return 1;
 }
-/*-----------------------------------------------------------------------------------*/
-static err_t
-http_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
-{
+
+static err_t http_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err) {
   int i;
   char *data;
   struct http_state *hs;
@@ -399,10 +362,13 @@ http_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
 			  } else {
 				  hs->postdata[hs->postpos++] = c;
 				  if(postNum == 0 && beginPost) {
+					   downloadingLED();
 						printk("           Receiving kernel...");
 				  } else if(postNum == 1 && beginPost) {
+					   downloadingLED();
 						printk("           Receiving initrd...");
 				  } else if(postNum == 2 && beginPost) {
+					   downloadingLED();
 						printk("           Receiving append...");
 				  }
 
@@ -427,10 +393,8 @@ http_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
   }
   return ERR_OK;
 }
-/*-----------------------------------------------------------------------------------*/
-static err_t
-http_accept(void *arg, struct tcp_pcb *pcb, err_t err)
-{
+
+static err_t http_accept(void *arg, struct tcp_pcb *pcb, err_t err) {
   struct http_state *hs;
 
   tcp_setprio(pcb, TCP_PRIO_MIN);
@@ -470,10 +434,8 @@ http_accept(void *arg, struct tcp_pcb *pcb, err_t err)
   
   return ERR_OK;
 }
-/*-----------------------------------------------------------------------------------*/
-void
-netboot_init(void)
-{
+
+void netboot_init(void) {
   struct tcp_pcb *pcb;
 
   pcb = tcp_new();
@@ -483,6 +445,5 @@ netboot_init(void)
   tcp_accept(pcb, http_accept);
   cromwellSuccess();
   printk("\n\n\n\n\n           Go to 'http://ip.address.shown.above' to begin.\n\n");
-  downloadingLED();
+  inputLED();
 }
-/*-----------------------------------------------------------------------------------*/

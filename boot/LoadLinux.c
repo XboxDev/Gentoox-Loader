@@ -34,7 +34,7 @@ static u32 dwKernelSize= 0, dwInitrdSize = 0;
 
 
 void ExittoLinux(CONFIGENTRY *config);
-void ExittoLinuxPacklet(u32 initSize, char *append);
+void ExittoLinuxFromNet(u32 initrdSize, char *append);
 void startLinux(void* initrdStart, unsigned long initrdSize, const char* appendLine);
 void setup(void* KernelPos, void* PhysInitrdPos, unsigned long InitrdSize, const char* kernel_cmdline);
 void I2CRebootSlow(void);
@@ -547,6 +547,8 @@ int BootLoadFlashCD(int cdromId) {
 
 		busyLED();
 
+		busyLED();
+
 		VIDEO_ATTR=0xffffffff;
 
 		//Try to load image.bin - if we can't after a while, give up.
@@ -636,21 +638,21 @@ void ExittoLinux(CONFIGENTRY *config) {
 	startLinux((void*)INITRD_START, dwInitrdSize, config->szAppend);
 }
 
-void ExittoLinuxPacklet(u32 initSize, char* append) {
+void ExittoLinuxFromNet(u32 initrdSize, char* append) {
 	busyLED();
 	VIDEO_ATTR=0xff8888a8;
 	//BootPrintConfig(config);
 	//printk("     Kernel:  %s\n", (char *)(0x00090200+(*((u16 *)0x9020e)) ));
 	//printk("\n");
 	{
-		char *sz="\2Starting Packlet\2";
+		char *sz="\2Starting titlehere\2";
 		VIDEO_CURSOR_POSX=((vmode.width-BootVideoGetStringTotalWidth(sz))/2)*4;
 		VIDEO_CURSOR_POSY=vmode.height-64;
 		VIDEO_ATTR=0xff00ff00;
-		printk("\2Starting Packlet\2");
+		printk("\2Starting Linux\2");
 	}
 	setLED("rrrr");
-	startLinux((void*)INITRD_START, initSize, append);
+	startLinux((void*)INITRD_START, initrdSize, append);
 }
 	
 

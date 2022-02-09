@@ -8,14 +8,14 @@
  ***************************************************************************/
 #include "include/config.h"
 
-void incrementAlphabetURL(void *chr);
-void decrementAlphabetURL(void *chr);
-void nextLetterURL(void *chr);
-void deleteLetterURL(void *chr);
-void setNumURL(void *chr);
-void setLCURL(void *chr);
-void setUCURL(void *chr);
-void setFullStopURL(void *chr);
-void setFSlashURL(void *chr);
-void setDashURL(void *chr);
-void setUScoreURL(void *chr);
+void incrementAlphabetInitrdPath(void *chr);
+void decrementAlphabetInitrdPath(void *chr);
+void nextLetterInitrdPath(void *chr);
+void deleteLetterInitrdPath(void *chr);
+void setNumInitrdPath(void *chr);
+void setLCInitrdPath(void *chr);
+void setUCInitrdPath(void *chr);
+void setFullStopInitrdPath(void *chr);
+void setFSlashInitrdPath(void *chr);
+void setDashInitrdPath(void *chr);
+void setUScoreInitrdPath(void *chr);

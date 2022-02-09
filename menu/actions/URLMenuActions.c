@@ -6,31 +6,20 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "IPMenuActions.h"
+//#include "URLMenuActions.h"
 #include "TextMenu.h"
 
 static int position = -1;
 char url[200];
 char *finalURL = url;
-extern int ipA, ipB, ipC, ipD, ipP;
 
-void fixPosition(int len) {
+static void fixPosition(int len) {
 	if(position < 0) {
 		position = len-1;
 	}
 }
 
-void enableHttpc(void *whatever) {
-	extern unsigned char *videosavepage;
-	memcpy((void*)FB_START,videosavepage,FB_SIZE);
-	VIDEO_ATTR=0xffef37;
-	printk("\n\n\n\n\n\n");
-	VIDEO_ATTR=0xffc8c8c8;
-	initialiseNetwork();
-	webBoot(ipA, ipB, ipC, ipD, ipP);
-}
-
-void incrementAlphabet(void *chr) {
+void incrementAlphabetURL(void *chr) {
 	memset(url, 0, 200);
 	strcpy(url, chr);
 
@@ -43,7 +32,7 @@ void incrementAlphabet(void *chr) {
    sprintf(chr, "%s", url);
 }
 
-void decrementAlphabet(void *chr) {
+void decrementAlphabetURL(void *chr) {
 	memset(url, 0, 200);
 
 	strcpy(url, chr);
@@ -56,7 +45,7 @@ void decrementAlphabet(void *chr) {
    sprintf(chr, "%s", url);
 }
 
-void nextLetter(void *chr) {
+void nextLetterURL(void *chr) {
 	memset(url, 0, 200);
 	strcpy(url, chr);
 
@@ -73,7 +62,7 @@ void nextLetter(void *chr) {
 	}
 }
 
-void deleteLetter(void *chr) {
+void deleteLetterURL(void *chr) {
 	memset(url, 0, 200);
 	strcpy(url, chr);
 	fixPosition(strlen(url));
@@ -86,7 +75,7 @@ void deleteLetter(void *chr) {
 	}
 }
 
-void setNum(void *chr) {
+void setNumURL(void *chr) {
 	memset(url, 0, 200);
 	strcpy(url, chr);
 	fixPosition(strlen(url));
@@ -95,7 +84,7 @@ void setNum(void *chr) {
    sprintf(chr, "%s", url);
 }
 
-void setLC(void *chr) {
+void setLCURL(void *chr) {
 	memset(url, 0, 200);
 	strcpy(url, chr);
 	fixPosition(strlen(url));
@@ -110,7 +99,7 @@ void setLC(void *chr) {
    sprintf(chr, "%s", url);
 }
 
-void setUC(void *chr) {
+void setUCURL(void *chr) {
 	memset(url, 0, 200);
 	strcpy(url, chr);
 	fixPosition(strlen(url));
@@ -125,7 +114,7 @@ void setUC(void *chr) {
    sprintf(chr, "%s", url);
 }
 
-void setFullStop(void *chr) {
+void setFullStopURL(void *chr) {
 	memset(url, 0, 200);
 	strcpy(url, chr);
 	fixPosition(strlen(url));
@@ -134,7 +123,7 @@ void setFullStop(void *chr) {
    sprintf(chr, "%s", url);
 }
 
-void setFSlash(void *chr) {
+void setFSlashURL(void *chr) {
 	memset(url, 0, 200);
 	strcpy(url, chr);
 	fixPosition(strlen(url));
@@ -143,7 +132,7 @@ void setFSlash(void *chr) {
    sprintf(chr, "%s", url);
 }
 
-void setDash(void *chr) {
+void setDashURL(void *chr) {
 	memset(url, 0, 200);
 	strcpy(url, chr);
 	fixPosition(strlen(url));
@@ -152,7 +141,7 @@ void setDash(void *chr) {
    sprintf(chr, "%s", url);
 }
 
-void setUScore(void *chr) {
+void setUScoreURL(void *chr) {
 	memset(url, 0, 200);
 	strcpy(url, chr);
 	fixPosition(strlen(url));

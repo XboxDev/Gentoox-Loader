@@ -11,15 +11,15 @@
 #include "TextMenu.h"
 
 #include "VideoInitialization.h"
-#include "URLMenuActions.h"
+#include "KernelPathMenuActions.h"
 
-TEXTMENU *URLMenuInit(void) {
+TEXTMENU *KernelPathMenuInit(void) {
 	
 	TEXTMENUITEM *itemPtr;
 	TEXTMENU *menuPtr;
 
-	extern char url[200];
-	memset(url, 0, 200);
+	extern char kernelPath[200];
+	memset(kernelPath, 0, 200);
 
 	//Create the root menu - MANDATORY
 	menuPtr = (TEXTMENU*)malloc(sizeof(TEXTMENU));
@@ -27,19 +27,19 @@ TEXTMENU *URLMenuInit(void) {
 	menuPtr->timeout = 1;
 	menuPtr->longTitle = 1;
 	menuPtr->visibleCount = 3;
-	strcpy(menuPtr->szCaption, "/gentoox");
+	strcpy(menuPtr->szCaption, "/vmlinuz");
 	menuPtr->firstMenuItem=NULL;
 
-	strcpy(url, menuPtr->szCaption);
+	strcpy(kernelPath, menuPtr->szCaption);
 
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 	strcpy(itemPtr->szCaption, "Next ->");
 	itemPtr->functionPtr=DrawChildTextMenu;
-	itemPtr->functionDataPtr = (void *)KernelPathMenuInit();
-	itemPtr->functionLeftPtr=decrementAlphabetURL;
+	itemPtr->functionDataPtr = (void *)InitrdPathMenuInit();
+	itemPtr->functionLeftPtr=decrementAlphabetKernelPath;
 	itemPtr->functionLeftDataPtr = menuPtr->szCaption;
-	itemPtr->functionRightPtr=incrementAlphabetURL;
+	itemPtr->functionRightPtr=incrementAlphabetKernelPath;
 	itemPtr->functionRightDataPtr = menuPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 
@@ -47,11 +47,11 @@ TEXTMENU *URLMenuInit(void) {
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 	sprintf(itemPtr->szCaption, "->");
-	itemPtr->functionPtr=nextLetterURL;
+	itemPtr->functionPtr=nextLetterKernelPath;
 	itemPtr->functionDataPtr = menuPtr->szCaption;
-	itemPtr->functionLeftPtr=decrementAlphabetURL;
+	itemPtr->functionLeftPtr=decrementAlphabetKernelPath;
 	itemPtr->functionLeftDataPtr = menuPtr->szCaption;
-	itemPtr->functionRightPtr=incrementAlphabetURL;
+	itemPtr->functionRightPtr=incrementAlphabetKernelPath;
 	itemPtr->functionRightDataPtr = menuPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 
@@ -59,11 +59,11 @@ TEXTMENU *URLMenuInit(void) {
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 	sprintf(itemPtr->szCaption, "<-");
-	itemPtr->functionPtr=deleteLetterURL;
+	itemPtr->functionPtr=deleteLetterKernelPath;
 	itemPtr->functionDataPtr = menuPtr->szCaption;
-	itemPtr->functionLeftPtr=decrementAlphabetURL;
+	itemPtr->functionLeftPtr=decrementAlphabetKernelPath;
 	itemPtr->functionLeftDataPtr = menuPtr->szCaption;
-	itemPtr->functionRightPtr=incrementAlphabetURL;
+	itemPtr->functionRightPtr=incrementAlphabetKernelPath;
 	itemPtr->functionRightDataPtr = menuPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 
@@ -71,11 +71,12 @@ TEXTMENU *URLMenuInit(void) {
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 	sprintf(itemPtr->szCaption, "Uppercase");
-	itemPtr->functionPtr=setUCURL;
+	itemPtr->functionPtr=setUCKernelPath;
 	itemPtr->functionDataPtr = menuPtr->szCaption;
-	itemPtr->functionLeftPtr=decrementAlphabetURL;
+	itemPtr->functionDataPtr = menuPtr->szCaption;
+	itemPtr->functionLeftPtr=decrementAlphabetKernelPath;
 	itemPtr->functionLeftDataPtr = menuPtr->szCaption;
-	itemPtr->functionRightPtr=incrementAlphabetURL;
+	itemPtr->functionRightPtr=incrementAlphabetKernelPath;
 	itemPtr->functionRightDataPtr = menuPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 
@@ -83,11 +84,11 @@ TEXTMENU *URLMenuInit(void) {
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 	sprintf(itemPtr->szCaption, "Lowercase");
-	itemPtr->functionPtr=setLCURL;
+	itemPtr->functionPtr=setLCKernelPath;
 	itemPtr->functionDataPtr = menuPtr->szCaption;
-	itemPtr->functionLeftPtr=decrementAlphabetURL;
+	itemPtr->functionLeftPtr=decrementAlphabetKernelPath;
 	itemPtr->functionLeftDataPtr = menuPtr->szCaption;
-	itemPtr->functionRightPtr=incrementAlphabetURL;
+	itemPtr->functionRightPtr=incrementAlphabetKernelPath;
 	itemPtr->functionRightDataPtr = menuPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 
@@ -95,11 +96,11 @@ TEXTMENU *URLMenuInit(void) {
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 	sprintf(itemPtr->szCaption, "Numbers");
-	itemPtr->functionPtr=setNumURL;
+	itemPtr->functionPtr=setNumKernelPath;
 	itemPtr->functionDataPtr = menuPtr->szCaption;
-	itemPtr->functionLeftPtr=decrementAlphabetURL;
+	itemPtr->functionLeftPtr=decrementAlphabetKernelPath;
 	itemPtr->functionLeftDataPtr = menuPtr->szCaption;
-	itemPtr->functionRightPtr=incrementAlphabetURL;
+	itemPtr->functionRightPtr=incrementAlphabetKernelPath;
 	itemPtr->functionRightDataPtr = menuPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 
@@ -107,11 +108,11 @@ TEXTMENU *URLMenuInit(void) {
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 	sprintf(itemPtr->szCaption, "Fullstop (.)");
-	itemPtr->functionPtr=setFullStopURL;
+	itemPtr->functionPtr=setFullStopKernelPath;
 	itemPtr->functionDataPtr = menuPtr->szCaption;
-	itemPtr->functionLeftPtr=decrementAlphabetURL;
+	itemPtr->functionLeftPtr=decrementAlphabetKernelPath;
 	itemPtr->functionLeftDataPtr = menuPtr->szCaption;
-	itemPtr->functionRightPtr=incrementAlphabetURL;
+	itemPtr->functionRightPtr=incrementAlphabetKernelPath;
 	itemPtr->functionRightDataPtr = menuPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 
@@ -119,11 +120,11 @@ TEXTMENU *URLMenuInit(void) {
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 	sprintf(itemPtr->szCaption, "Forward slash (/)");
-	itemPtr->functionPtr=setFSlashURL;
+	itemPtr->functionPtr=setFSlashKernelPath;
 	itemPtr->functionDataPtr = menuPtr->szCaption;
-	itemPtr->functionLeftPtr=decrementAlphabetURL;
+	itemPtr->functionLeftPtr=decrementAlphabetKernelPath;
 	itemPtr->functionLeftDataPtr = menuPtr->szCaption;
-	itemPtr->functionRightPtr=incrementAlphabetURL;
+	itemPtr->functionRightPtr=incrementAlphabetKernelPath;
 	itemPtr->functionRightDataPtr = menuPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 
@@ -131,11 +132,11 @@ TEXTMENU *URLMenuInit(void) {
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 	sprintf(itemPtr->szCaption, "Dash (-)");
-	itemPtr->functionPtr=setDashURL;
+	itemPtr->functionPtr=setDashKernelPath;
 	itemPtr->functionDataPtr = menuPtr->szCaption;
-	itemPtr->functionLeftPtr=decrementAlphabetURL;
+	itemPtr->functionLeftPtr=decrementAlphabetKernelPath;
 	itemPtr->functionLeftDataPtr = menuPtr->szCaption;
-	itemPtr->functionRightPtr=incrementAlphabetURL;
+	itemPtr->functionRightPtr=incrementAlphabetKernelPath;
 	itemPtr->functionRightDataPtr = menuPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 
@@ -143,11 +144,11 @@ TEXTMENU *URLMenuInit(void) {
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
 	sprintf(itemPtr->szCaption, "Underscore (_)");
-	itemPtr->functionPtr=setUScoreURL;
+	itemPtr->functionPtr=setUScoreKernelPath;
 	itemPtr->functionDataPtr = menuPtr->szCaption;
-	itemPtr->functionLeftPtr=decrementAlphabetURL;
+	itemPtr->functionLeftPtr=decrementAlphabetKernelPath;
 	itemPtr->functionLeftDataPtr = menuPtr->szCaption;
-	itemPtr->functionRightPtr=incrementAlphabetURL;
+	itemPtr->functionRightPtr=incrementAlphabetKernelPath;
 	itemPtr->functionRightDataPtr = menuPtr->szCaption;
 	TextMenuAddItem(menuPtr, itemPtr);
 

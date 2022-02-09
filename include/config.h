@@ -1,7 +1,7 @@
 ////////////////////// compile-time options ////////////////////////////////
 
 //Gentoox Loader version number
-#define VERSION "6.03c"
+#define VERSION "6.04"
 
 // selects between the supported video modes, see boot.h for enum listing those available
 //#define VIDEO_PREFERRED_MODE VIDEO_MODE_800x600
@@ -46,10 +46,10 @@
 #define LWIP
 
 // IP configuration for WebBoot
-#define WB_BLOCK_A 193
-#define WB_BLOCK_B 1
-#define WB_BLOCK_C 193
-#define WB_BLOCK_D 66
+#define WB_BLOCK_A 192
+#define WB_BLOCK_B 168
+#define WB_BLOCK_C 1
+#define WB_BLOCK_D 200
 #define WB_PORT 80
 
 // IP configuration for WebUpdate

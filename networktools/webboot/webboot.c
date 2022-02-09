@@ -20,9 +20,7 @@
 
 #include "boot.h"
 #include "lwip/debug.h"
-
 #include "lwip/stats.h"
-
 #include "lwip/tcp.h"
 #include "memory_layout.h"
 #include <shared.h>
@@ -37,15 +35,22 @@ static struct ip_addr ipaddr;
 static struct tcp_pcb *pcb = NULL;
 static struct pbuf *q;
 static u16_t port = 80;
+static u32_t colour = 0xffff0000;
 
-static err_t handlePacklet(void *arg, struct tcp_pcb *pcb, err_t err);
-static err_t recvPacklet(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err);
-void processPayload(void);
+static err_t handleKernel(void *arg, struct tcp_pcb *pcb, err_t err);
+static err_t handleInitrd(void *arg, struct tcp_pcb *pcb, err_t err);
+static err_t handleAppend(void *arg, struct tcp_pcb *pcb, err_t err);
+static err_t recvKernel(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err);
+static err_t recvInitrd(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err);
+static err_t recvAppend(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err);
 static void connErr(void *arg, err_t err);
 static int isdigit(char c);
-void bootPacklet(void);
+void boot(void);
 void processHeader(void);
 extern char *finalURL;
+extern char *finalKernelPath;
+extern char *finalInitrdPath;
+extern char *finalAppendPath;
 
 static int isdigit(char c) {
 	return ((c) >= '0' && (c) <= '9');
@@ -66,71 +71,57 @@ void processHeader() {
 }
 
 static void connErr(void *arg, err_t err) {
-	printk("\n           Connection error");
-	dots();
+	printk("\n           Connection error...");
 	cromwellError();
 	printk("\n");
-	while(1);
+//	while(1);
 }
 
-void processPayload() {
-	int payloadIndex = fileLen;
-
-	// Get to the kernel filesize.
-	while(!isdigit(tempBuf[payloadIndex])) {
-		payloadIndex--;
-	}
-
-	while(isdigit(tempBuf[payloadIndex])) {
-		payloadIndex--;
-	}
-	payloadIndex++;
-	kernelSize = simple_strtol(tempBuf+payloadIndex, NULL, 10);
-	//printk("Kernel Size: %i\n", kernelSize);
-
-	// Get to the initrd filesize.
-	payloadIndex--;
-	while(!isdigit(tempBuf[payloadIndex])) {
-		payloadIndex--;
-	}
-
-	while(isdigit(tempBuf[payloadIndex])) {
-		payloadIndex--;
-	}
-	payloadIndex++;
-	initrdSize = simple_strtol(tempBuf+payloadIndex, NULL, 10);
-	//printk("InitRD Size: %i\n", initrdSize);
-
-	payloadIndex = initrdSize+kernelSize;
-
-	// Get the "Append" information.
-	i = 0;
-	appendLine = (char*)malloc(1024);
-	while(tempBuf[payloadIndex] != '|') {
-		appendLine[i] = tempBuf[payloadIndex];
-		i++;
-		appendLine[i] = '\0';
-		payloadIndex++;
-	}
-}
-
-// Boot the Packlet
-void bootPacklet() {
+// Boot the system.
+void boot() {
 	free(requestGET);
 	free(requestHEAD);
 	eth_disable();
-	memPlaceKernel(tempBuf+initrdSize, kernelSize);
-	ExittoLinuxPacklet(initrdSize, appendLine);
+	ExittoLinuxFromNet(initrdSize, appendLine);
 }
 
-static err_t recvPacklet(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err) {
+static err_t recvKernel(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err) {
 	tcp_recved(pcb, p->tot_len);
 	if(p == NULL) {
 		tcp_close(pcb);
 		if(head == 0) {
-			printk("Download finished - If nothing happens, your URL may be wrong.\n");
-			processPayload();
-			bootPacklet();
+			//printk("Kernel downloaded (%i).\n", fileLen);
+			memPlaceKernel(tempBuf, fileLen);
+			//printk("Kernel Loaded.\n");
+			cromwellSuccess();
+			printk("\n");
+			
+			colour = 0xff00ff00;
+			free(requestGET);
+			free(requestHEAD);
+			requestGET = (char *)malloc(1024);
+			requestHEAD = (char *)malloc(1024);
+			memset(requestGET, 0, 1024);
+			memset(requestHEAD, 0, 1024);
+			sprintf(requestGET, "GET %s%s HTTP/1.0\n\n", finalURL, finalInitrdPath);
+			sprintf(requestHEAD, "HEAD %s%s HTTP/1.0\n\n", finalURL, finalInitrdPath);
+			contLen = progCheck = hLen = fileLen = eoh = 0;
+			head = 1;
+			contLen = 11*1024*1024;
+			fraction = contLen/64;
+
+			if(header != NULL) {
+				free(header);
+				header = NULL;
+			}
+			header = (char*)malloc(5120);
+
+			memset(tempBuf, 0, 15*1024*1024);
+
+			pcb = tcp_new();
+			tcp_err(pcb, connErr);
+			tcp_setprio(pcb, TCP_PRIO_MAX);
+			tcp_connect(pcb, &ipaddr, port, handleInitrd);
 		} else {
 			head = 0;
 //			printk("Header:\n%s\n", header);
@@ -138,7 +129,7 @@ static err_t recvPacklet(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t e
 			pcb = tcp_new();
 			tcp_err(pcb, connErr);
 			tcp_setprio(pcb, TCP_PRIO_MAX);
-			tcp_connect(pcb, &ipaddr, port, handlePacklet);
+			tcp_connect(pcb, &ipaddr, port, handleKernel);
 		}
 
 	}
@@ -171,7 +162,7 @@ static err_t recvPacklet(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t e
 					fileLen++;
 					tempBuf[fileLen] = '\0';
 					if((fileLen > progCheck) || (fileLen >= contLen)) {
-						DisplayProgressBar(fileLen,contLen,0xffff0000);
+						DisplayProgressBar(fileLen, contLen, colour);
 						progCheck += fraction;
 					}
 				}
@@ -183,7 +174,7 @@ static err_t recvPacklet(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t e
 					if(head == 0) {
 						eoh = 1;
 					}
-					dots();
+					printk("...");
 				}
 			}
 		}
@@ -192,14 +183,210 @@ static err_t recvPacklet(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t e
 	return ERR_OK;
 }	
 
-static err_t handlePacklet(void *arg, struct tcp_pcb *pcb, err_t err) {
-	tcp_recv(pcb, recvPacklet);
+static err_t recvInitrd(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err) {
+	tcp_recved(pcb, p->tot_len);
+	if(p == NULL) {
+		tcp_close(pcb);
+		if(head == 0) {
+			//printk("Initrd downloaded (%i).\n", fileLen);
+			initrdSize = fileLen;
+			cromwellSuccess();
+			printk("\n");
+
+			colour = 0xff0000ff;
+			free(requestGET);
+			free(requestHEAD);
+			requestGET = (char *)malloc(1024);
+			requestHEAD = (char *)malloc(1024);
+			memset(requestGET, 0, 1024);
+			memset(requestHEAD, 0, 1024);
+			sprintf(requestGET, "GET %s%s HTTP/1.0\n\n", finalURL, finalAppendPath);
+			sprintf(requestHEAD, "HEAD %s%s HTTP/1.0\n\n", finalURL, finalAppendPath);
+			contLen = progCheck = hLen = fileLen = eoh = 0;
+			head = 1;
+			contLen = 11*1024*1024;
+			fraction = contLen/64;
+
+			if(header != NULL) {
+				free(header);
+				header = NULL;
+			}
+			header = (char*)malloc(5120);
+
+			pcb = tcp_new();
+			tcp_err(pcb, connErr);
+			tcp_setprio(pcb, TCP_PRIO_MAX);
+			tcp_connect(pcb, &ipaddr, port, handleAppend);
+		} else {
+			head = 0;
+//			printk("Header:\n%s\n", header);
+			processHeader();
+			pcb = tcp_new();
+			tcp_err(pcb, connErr);
+			tcp_setprio(pcb, TCP_PRIO_MAX);
+			tcp_connect(pcb, &ipaddr, port, handleInitrd);
+		}
+
+	}
+	if(eoh == 0) {
+		c[0] = '\0';
+		c[1] = '\0';
+		c[2] = '\0';
+		c[3] = '\0';
+	}
+	
+	for (q = p; q; q = q->next) {
+		for (i = 0; i < q->len; i++) {
+			if(eoh == 0) {
+				c[0] = c[1];
+				c[1] = c[2];
+				c[2] = c[3];
+			}
+
+			c[3] = ((char *)q->payload)[i];
+
+			if(head == 1) {
+				header[hLen] = c[3];
+				hLen++;
+				header[hLen] = '\0';
+			}
+
+			if(eoh == 1) {
+				if(head == 0) {
+					tempBuf[fileLen] = c[3];
+					fileLen++;
+					tempBuf[fileLen] = '\0';
+					if((fileLen > progCheck) || (fileLen >= contLen)) {
+						DisplayProgressBar(fileLen, contLen, colour);
+						progCheck += fraction;
+					}
+				}
+			}
+			
+			// Found the header.
+			if(eoh == 0) {
+				if((c[0] == '\r') && (c[1] == '\n') && (c[2] == '\r') && (c[3] == '\n')) {
+					if(head == 0) {
+						eoh = 1;
+					}
+					printk("...");
+				}
+			}
+		}
+	}
+	pbuf_free(p);
+	return ERR_OK;
+}	
+
+static err_t recvAppend(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err) {
+	tcp_recved(pcb, p->tot_len);
+	if(p == NULL) {
+		tcp_close(pcb);
+		if(head == 0) {
+			//printk("Append downloaded (%i).\n", fileLen);
+			//printk("append: %s", appendLine);
+			cromwellSuccess();
+			printk("\n");
+			boot();
+		} else {
+			head = 0;
+//			printk("Header:\n%s\n", header);
+			processHeader();
+			appendLine = (char*)malloc(contLen+1);
+			pcb = tcp_new();
+			tcp_err(pcb, connErr);
+			tcp_setprio(pcb, TCP_PRIO_MAX);
+			tcp_connect(pcb, &ipaddr, port, handleAppend);
+		}
+
+	}
+	if(eoh == 0) {
+		c[0] = '\0';
+		c[1] = '\0';
+		c[2] = '\0';
+		c[3] = '\0';
+	}
+	
+	for (q = p; q; q = q->next) {
+		for (i = 0; i < q->len; i++) {
+			if(eoh == 0) {
+				c[0] = c[1];
+				c[1] = c[2];
+				c[2] = c[3];
+			}
+
+			c[3] = ((char *)q->payload)[i];
+
+			if(head == 1) {
+				header[hLen] = c[3];
+				hLen++;
+				header[hLen] = '\0';
+			}
+
+			if(eoh == 1) {
+				if(head == 0) {
+					appendLine[fileLen] = c[3];
+					fileLen++;
+					appendLine[fileLen] = '\0';
+					if((fileLen > progCheck) || (fileLen >= contLen)) {
+						DisplayProgressBar(fileLen, contLen, colour);
+						progCheck += fraction;
+					}
+				}
+			}
+			
+			// Found the header.
+			if(eoh == 0) {
+				if((c[0] == '\r') && (c[1] == '\n') && (c[2] == '\r') && (c[3] == '\n')) {
+					if(head == 0) {
+						eoh = 1;
+					}
+					printk("...");
+				}
+			}
+		}
+	}
+	pbuf_free(p);
+	return ERR_OK;
+}	
+
+static err_t handleKernel(void *arg, struct tcp_pcb *pcb, err_t err) {
+	tcp_recv(pcb, recvKernel);
 	if(head == 1) {
+		printk("           URL: %s%s\n", finalURL, finalKernelPath);
 		printk("           Contacting server");
 		tcp_write(pcb, requestHEAD, strlen(requestHEAD), 0);
 	} else {
 		cromwellSuccess();
-		printk("           Downloading Packlet");
+		printk("           Downloading Kernel");
+		tcp_write(pcb, requestGET, strlen(requestGET), 0);
+	}		
+	return ERR_OK;
+}
+
+static err_t handleInitrd(void *arg, struct tcp_pcb *pcb, err_t err) {
+	tcp_recv(pcb, recvInitrd);
+	if(head == 1) {
+		printk("           URL: %s%s\n", finalURL, finalInitrdPath);
+		printk("           Contacting server");
+		tcp_write(pcb, requestHEAD, strlen(requestHEAD), 0);
+	} else {
+		cromwellSuccess();
+		printk("           Downloading Initrd");
+		tcp_write(pcb, requestGET, strlen(requestGET), 0);
+	}		
+	return ERR_OK;
+}
+
+static err_t handleAppend(void *arg, struct tcp_pcb *pcb, err_t err) {
+	tcp_recv(pcb, recvAppend);
+	if(head == 1) {
+		printk("           URL: %s%s\n", finalURL, finalAppendPath);
+		printk("           Contacting server");
+		tcp_write(pcb, requestHEAD, strlen(requestHEAD), 0);
+	} else {
+		cromwellSuccess();
+		printk("           Downloading Append");
 		tcp_write(pcb, requestGET, strlen(requestGET), 0);
 	}		
 	return ERR_OK;
@@ -210,12 +397,12 @@ void webboot_init(int A, int B, int C, int D, int P) {
 	requestHEAD = (char *)malloc(1024);
 	memset(requestGET, 0, 1024);
 	memset(requestHEAD, 0, 1024);
-	sprintf(requestGET, "GET %s HTTP/1.0\n\n", finalURL);	
-	sprintf(requestHEAD, "HEAD %s HTTP/1.0\n\n", finalURL);	
+	sprintf(requestGET, "GET %s%s HTTP/1.0\n\n", finalURL, finalKernelPath);
+	sprintf(requestHEAD, "HEAD %s%s HTTP/1.0\n\n", finalURL, finalKernelPath);
 	contLen = progCheck = hLen = fileLen = eoh = 0;
 	head = 1;
 	contLen = 11*1024*1024;
-	fraction = contLen/16;
+	fraction = contLen/64;
 
 	if(header != NULL) {
 		free(header);
@@ -234,12 +421,12 @@ void webboot_init(int A, int B, int C, int D, int P) {
 	if(pcb != NULL) {
 		tcp_abort(pcb);
 	}
+
 	pcb = tcp_new();
 	tcp_err(pcb, connErr);
 	tcp_setprio(pcb, TCP_PRIO_MAX);
-	tcp_connect(pcb, &ipaddr, port, handlePacklet);
+	tcp_connect(pcb, &ipaddr, port, handleKernel);
 	cromwellSuccess();
-	printk("           Server: %i.%i.%i.%i:%i\n", A, B, C, D, P);
-	printk("           URL: %s\n", finalURL);
+	printk("           Server: %i.%i.%i.%i:%i\n\n", A, B, C, D, P);
 	downloadingLED();
 }
