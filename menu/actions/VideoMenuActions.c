@@ -40,6 +40,11 @@ void SetVideoStandard(void *menuItemText) {
 		strcpy(text, "TV Standard: PAL");
 		EepromSetVideoStandard(PAL_I);
 	}
+	// By default, make Unknown cycle back to PAL_I.
+	else if (!strcmp(text, "TV Standard: Unknown")) {
+		strcpy(text, "TV Standard: PAL");
+		EepromSetVideoStandard(PAL_I);
+	}
 
 }
 
