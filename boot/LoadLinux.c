@@ -599,7 +599,7 @@ void ExittoLinux(CONFIGENTRY *config) {
 		VIDEO_ATTR=0xff00ff00;
 		printk("\2Starting %s\2", config->title);
 	}
-	I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_RED1 | I2C_LED_RED2 | I2C_LED_RED3 );
+	setLED("rrrr");
 	startLinux((void*)INITRD_START, dwInitrdSize, config->szAppend);
 }
 	

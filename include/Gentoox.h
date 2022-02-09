@@ -1,5 +1,7 @@
+#ifndef _LEDMENUACTIONS_H_
+#define _LEDMENUACTIONS_H_
 /**
- * Gentoox loader includes for LoadLinux.c
+ * Gentoox loader includes.
  * Copyright (C) Thomas "ShALLaX" Pedley (gentoox@shallax.com)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,82 +19,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-void errorLED(void) {
-   I2cSetFrontpanelLed(I2C_LED_RED0);
-}
-
-void busyLED(void) {
-	I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_GREEN1 | I2C_LED_GREEN2 | I2C_LED_RED2 | I2C_LED_GREEN3);	
-}
-
-void inputLED(void) {
-	I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_GREEN0 | I2C_LED_GREEN2 | I2C_LED_RED2);	
-}
-
-void goodLED(void) {
-	I2cSetFrontpanelLed(I2C_LED_GREEN0 | I2C_LED_GREEN2);	
-}
-
-void importantLED(void) {
-	I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_GREEN1 | I2C_LED_RED1 | I2C_LED_RED2 | I2C_LED_GREEN3 | I2C_LED_RED3);	
-}
-
-void downloadingLED(void) {
-	I2cSetFrontpanelLed(I2C_LED_GREEN0 | I2C_LED_RED0 | I2C_LED_GREEN1 | I2C_LED_RED2 | I2C_LED_RED3);	
-}
-
-
-void uberLED(void) {
-	I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_RED2);	
-}
-
-void highLED(void) {
-	I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_RED1 | I2C_LED_RED2 | I2C_LED_RED3);	
-}
-
-void midLED(void) {
-	I2cSetFrontpanelLed(I2C_LED_GREEN0 | I2C_LED_RED0 | I2C_LED_GREEN1 | I2C_LED_RED1 | I2C_LED_GREEN2 | I2C_LED_RED2);	
-}
-
-void lowLED(void) {
-	I2cSetFrontpanelLed(I2C_LED_GREEN0 | I2C_LED_GREEN1 | I2C_LED_GREEN2 | I2C_LED_GREEN3);	
-}
-
-void dots(void) {
-   wait_ms(333);
-   printk(".");
-   wait_ms(333);
-   printk(".");
-   wait_ms(333);
-   printk(".");
-   wait_ms(333);
-}
-
-void cromwellError(void) {
-   VIDEO_ATTR=0xffd8d8d8;
-   printk("\t[ ");
-   VIDEO_ATTR=0xffff0000;
-   printk("!!");
-   VIDEO_ATTR=0xffd8d8d8;
-   printk(" ]");
-	errorLED();
-}
-
-void cromwellWarning(void) {
-   VIDEO_ATTR=0xffd8d8d8;
-   printk("\t[ ");
-   VIDEO_ATTR=0xffffae01;
-   printk("!!");
-   VIDEO_ATTR=0xffd8d8d8;
-   printk(" ]\n");
-	errorLED();
-}
-
-void cromwellSuccess(void) {
-   VIDEO_ATTR=0xffd8d8d8;
-   printk("\t[ ");
-   VIDEO_ATTR=0xff00ff00;
-   printk("ok");
-   VIDEO_ATTR=0xffd8d8d8;
-   printk(" ]\n");
-}
+void errorLED(void);
+void busyLED(void);
+void inputLED(void);
+void goodLED(void);
+void importantLED(void);
+void downloadingLED(void);
+void uberLED(void);
+void highLED(void);
+void midLED(void);
+void lowLED(void);
+void dots(void);
+void cromwellError(void);
+void cromwellWarning(void);
+void cromwellSuccess(void);
+#endif

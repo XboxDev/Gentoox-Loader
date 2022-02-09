@@ -97,7 +97,7 @@ extern void BootResetAction ( void ) {
 		);
 	}
 	// display solid red frontpanel LED while we start up
-	I2cSetFrontpanelLed(I2C_LED_RED0 | I2C_LED_RED1 | I2C_LED_RED2 | I2C_LED_RED3 );
+	setLED("rrrr");
 	// paint the backdrop
 #ifndef DEBUG_MODE
 	BootVideoClearScreen(&jpegBackdrop, 0, 0xffff);
