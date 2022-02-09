@@ -66,23 +66,6 @@ static void IconMenuDraw(int nXOffset, int nYOffset) {
 	if (selectedIcon==NULL) selectedIcon = firstIcon;
 	iconPtr = firstVisibleIcon;
 
-	if(firstVisibleIcon->previousIcon != NULL) {
-		opaqueness = SELECTED;
-	} else {
-		opaqueness = TRANSPARENTNESS;
-	}
-	
-	BootVideoJpegBlitBlend(
-		(u8 *)(FB_START+((vmode.width * (nYOffset-74))+nXOffset+(50)) * 4),
-		vmode.width, // dest bytes per line
-		&jpegBackdrop, // source jpeg object
-		(u8 *)(jpegBackdrop.pData+(ICON_WIDTH*5 * jpegBackdrop.bpp)),
-		0xff00ff|(((u32)opaqueness)<<24),
-		(u8 *)(jpegBackdrop.pBackdrop + ((jpegBackdrop.width * (nYOffset-74)) + nXOffset+(50)) * jpegBackdrop.bpp),
-		ICON_WIDTH, ICON_HEIGHT
-	);
-
-
 	//There are max 3 (three) 'bays' for displaying icons in - we only draw the 3.
 	for (iconcount=0; iconcount<3; iconcount++) {
 		if (iconPtr==NULL) {
@@ -113,22 +96,35 @@ static void IconMenuDraw(int nXOffset, int nYOffset) {
 		iconPtr = iconPtr->nextIcon;
 	}
 
-	if(lastVisibleIcon->nextIcon != NULL) {
+	// If there is an icon off screen to the left, draw this icon.
+	if(firstVisibleIcon->previousIcon != NULL) {
+		//opaqueness = TRANSPARENTNESS;
 		opaqueness = SELECTED;
-	} else {
-		opaqueness = TRANSPARENTNESS;
+		BootVideoJpegBlitBlend(
+			(u8 *)(FB_START+((vmode.width * (nYOffset-74))+nXOffset+(50)) * 4),
+			vmode.width, // dest bytes per line
+			&jpegBackdrop, // source jpeg object
+			(u8 *)(jpegBackdrop.pData+(ICON_WIDTH*5 * jpegBackdrop.bpp)),
+			0xff00ff|(((u32)opaqueness)<<24),
+			(u8 *)(jpegBackdrop.pBackdrop + ((jpegBackdrop.width * (nYOffset-74)) + nXOffset+(50)) * jpegBackdrop.bpp),
+			ICON_WIDTH, ICON_HEIGHT
+		);
 	}
 
-	BootVideoJpegBlitBlend(
-		(u8 *)(FB_START+((vmode.width * (nYOffset-74))+nXOffset+(510)) * 4),
-		vmode.width, // dest bytes per line
-		&jpegBackdrop, // source jpeg object
-		(u8 *)(jpegBackdrop.pData+(ICON_WIDTH*6 * jpegBackdrop.bpp)),
-		0xff00ff|(((u32)opaqueness)<<24),
-		(u8 *)(jpegBackdrop.pBackdrop + ((jpegBackdrop.width * (nYOffset-74)) + nXOffset+(510)) * jpegBackdrop.bpp),
-		ICON_WIDTH, ICON_HEIGHT
-	);
-
+	// If there is an icon off screen to the right, draw this icon.
+	if(lastVisibleIcon->nextIcon != NULL) {
+		//opaqueness = TRANSPARENTNESS;
+		opaqueness = SELECTED;
+		BootVideoJpegBlitBlend(
+			(u8 *)(FB_START+((vmode.width * (nYOffset-74))+nXOffset+(510)) * 4),
+			vmode.width, // dest bytes per line
+			&jpegBackdrop, // source jpeg object
+			(u8 *)(jpegBackdrop.pData+(ICON_WIDTH*6 * jpegBackdrop.bpp)),
+			0xff00ff|(((u32)opaqueness)<<24),
+			(u8 *)(jpegBackdrop.pBackdrop + ((jpegBackdrop.width * (nYOffset-74)) + nXOffset+(510)) * jpegBackdrop.bpp),
+			ICON_WIDTH, ICON_HEIGHT
+		);
+	}
 }
 
 void IconMenu(void) {

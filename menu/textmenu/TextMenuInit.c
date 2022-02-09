@@ -64,6 +64,14 @@ TEXTMENU *TextMenuInit(void) {
 	itemPtr->functionDataPtr = (void *)LEDMenuInit();
 	TextMenuAddItem(menuPtr, itemPtr);
 
+	// Info Menu
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+	strcpy(itemPtr->szCaption, "Info Menu");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)InfoMenuInit();
+	TextMenuAddItem(menuPtr, itemPtr);
+
 	// Power Menu
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));

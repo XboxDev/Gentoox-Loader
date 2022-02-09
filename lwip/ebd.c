@@ -134,7 +134,7 @@ int run_lwip(void)
 	struct ip_addr ipaddr, netmask, gw;
 	struct netif netif;
 	busyLED();
-	printk("\n\n\n\n\n        Initialising TCP/IP");
+	printk("        Initialising TCP/IP");
 	dots();
 	mem_init();
 	memp_init();

@@ -42,7 +42,7 @@ void FlashBiosFromHDD(void *fname) {
 
 	res = BootReflashAndReset((char*)0x100000,offset,fileinfo.fileSize);
 
-	printk("\n\n\n\n\n        Flash failed",res);
+	printk("\n\n\n\n\n        Flash failed");
    CloseFATXPartition(partition);
 	dots();
 	cromwellError();
@@ -58,6 +58,9 @@ void FlashBiosFromCD(void *cdromId) {
 
 void enableLwip(void *whatever) {
 #ifdef FLASH
+	VIDEO_ATTR=0xffef37;
+	printk("\n\n\n\n\n        \2Net Flash\2\n\n\n");
+	VIDEO_ATTR=0xffc8c8c8;
 	initialiseNetwork();
 	netflash();
 #endif

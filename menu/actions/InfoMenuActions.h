@@ -1,3 +1,5 @@
+#ifndef _INFOMENUACTIONS_H_
+#define _INFOMENUACTIONS_H_
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -7,16 +9,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "boot.h"
-#include "video.h"
-#include "xbox.h"
-#include "BootEEPROM.h"
-#include "CDMenuActions.h"
+void ShowTemperature(void *);
+void ShowVideo(void *);
+void ShowEeprom(void *);
+void InfoHeader(char *title);
+void InfoFooter(void);
 
-void CDEject(void *whatever) {
-	I2CTransmitWord(0x10, 0x0c00);
-}
-
-void CDInject(void *whatever) {
-	I2CTransmitWord(0x10, 0x0c01);
-}
+#endif

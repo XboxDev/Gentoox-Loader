@@ -78,6 +78,16 @@ int initialiseNetwork(void)
 	{
 		eth_load(dev);
 	}
+	else
+	{
+		eth_load(dev);
+	}
+}
+
+int netflash(void)
+{
+	extern int run_lwip(void);
+	run_lwip();
 }
 
 int netflash(void)
