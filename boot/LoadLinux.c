@@ -83,8 +83,7 @@ CONFIGENTRY* LoadConfigNative(int drive, int partition) {
 	char *szGrub;
 	
 	szGrub = (char *) malloc(265+4);
-        memset(szGrub,0,256+4);
-        
+	memset(szGrub,0,256+4);
 	memset((u8 *)KERNEL_SETUP,0,2048);
 
 	szGrub[0]=0xff;
@@ -526,6 +525,8 @@ int BootLoadFlashCD(int cdromId) {
 			}
 			wait_ms(10);
 		}						
+		busyLED();
+
 		busyLED();
 
 		busyLED();

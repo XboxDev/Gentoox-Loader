@@ -109,7 +109,6 @@ close_conn(struct tcp_pcb *pcb, struct http_state *hs)
 		//printk ("\nGot BIOS-image over http, %d bytes\n", hs->bios_len);
 		memcpy ((void*)0x100000, hs->bios_start, hs->bios_len);
 		BootReflashAndReset((void*)0x100000,0,hs->bios_len);
-		printk ("FLASHING FAILED? - halting");
 		while (1)
 			;
   }
@@ -159,11 +158,11 @@ http_poll(void *arg, struct tcp_pcb *pcb)
   
   /*  printf("Polll\n");*/
   if (hs == NULL) {
-	  printk("p");
+	  //printk("p");
 	  /*tcp_abort(pcb);*/
     return ERR_OK;
   } else {
-	  printk("P");
+	  //printk("P");
     ++hs->retries;
     if (hs->retries == 4) {
       tcp_abort(pcb);
@@ -285,7 +284,7 @@ handle_post(struct http_state *hs)
 		}
 	}
 	if (!start) {
-		printk ("Could not find start...\n");
+		//printk ("Could not find start...\n");
 		return 0;
 	}
 
@@ -297,7 +296,7 @@ handle_post(struct http_state *hs)
 	}
 
 	if (!end) {
-		printk ("Could not find end...\n");
+		//printk ("Could not find end...\n");
 		return 0;
 	}
 
@@ -309,7 +308,7 @@ handle_post(struct http_state *hs)
 	if (len != 256*1024 && len != 512*1024 && len != 1024*1024) {
 		hs->file = http_files[3].data;
 		hs->left = http_files[3].len;
-		printk ("Illegal size, NOT flashing\n");
+		//printk("Illegal size, NOT flashing\n");
 		return 0;
 	}
 
@@ -390,7 +389,7 @@ http_accept(void *arg, struct tcp_pcb *pcb, err_t err)
   hs = mem_malloc(sizeof(struct http_state));
 
   if (hs == NULL) {
-    printk("http_accept: Out of memory\n");
+    //printk("http_accept: Out of memory\n");
     return ERR_MEM;
   }
 
