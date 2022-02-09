@@ -37,6 +37,9 @@ ICON *selectedIcon=NULL;
 ICON *firstVisibleIcon=NULL;
 ICON *lastVisibleIcon=NULL;
 int timedOut=0;
+int iconTimeRemain = 0;
+u32 temp=1;
+
 unsigned char *videosavepage;
 
 
@@ -64,6 +67,7 @@ static void IconMenuDraw(int nXOffset, int nYOffset) {
 	ICON *iconPtr;
 	int iconcount;
 	u8 opaqueness;
+	int tempX, tempY;
 
 	if (firstVisibleIcon==NULL) firstVisibleIcon = firstIcon;
 	if (selectedIcon==NULL) selectedIcon = firstIcon;
@@ -128,12 +132,27 @@ static void IconMenuDraw(int nXOffset, int nYOffset) {
 			ICON_WIDTH, ICON_HEIGHT
 		);
 	}
+
+	tempX = VIDEO_CURSOR_POSX;
+	tempY = VIDEO_CURSOR_POSY;
+	VIDEO_CURSOR_POSX=((172+((vmode.width-640)/2))<<2);
+	VIDEO_CURSOR_POSY=vmode.height - 250;
+
+	if(temp != 0) {
+		printk("\2Select from Menu \2 (%i)", iconTimeRemain);	
+	} else {
+		VIDEO_CURSOR_POSX += 52;
+		printk("\2Select from Menu \2", iconTimeRemain);	
+	}
+
+	VIDEO_CURSOR_POSX = tempX;
+	VIDEO_CURSOR_POSY = tempY;
 }
 
 void IconMenu(void) {
         
 	u32 COUNT_start;
-	u32 temp=1;
+	int oldIconTimeRemain = 0;
 	ICON *iconPtr=NULL;
 
 	extern int nTempCursorMbrX, nTempCursorMbrY; 
@@ -169,7 +188,7 @@ void IconMenu(void) {
 	while(1)
 	{
 		int changed=0;
-		wait_ms(75);	
+		wait_ms(10);	
 		if (risefall_xpad_BUTTON(TRIGGER_XPAD_PAD_RIGHT) == 1)
 		{
 			if (selectedIcon->nextIcon!=NULL) {
@@ -214,8 +233,14 @@ void IconMenu(void) {
 			temp=0;
 		}
 		//If anybody has toggled the xpad left/right, disable the timeout.
-		if (temp!=0) {
+		if(temp != 0) {
 			temp = IoInputDword(0x8008) - COUNT_start;
+			oldIconTimeRemain = iconTimeRemain;
+         iconTimeRemain = BOOT_TIMEWAIT - temp/0x369E99;
+			if(oldIconTimeRemain != iconTimeRemain) {
+				changed = 1;
+				memcpy((void*)FB_START,videosavepage,FB_SIZE);
+			}
 		}
 		
 		if ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) == 1) || risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_START) == 1 || 
@@ -231,6 +256,7 @@ void IconMenu(void) {
 			changed=1;
 			memcpy((void*)FB_START,videosavepage,FB_SIZE);
 		}
+
 		if (changed) {
 			BootVideoClearScreen(&jpegBackdrop, nTempCursorY, VIDEO_CURSOR_POSY+1);
 			IconMenuDraw(nModeDependentOffset, nTempCursorY);

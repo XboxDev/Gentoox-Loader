@@ -9,17 +9,7 @@
 #include "IPMenuActions.h"
 #include "TextMenu.h"
 
-static int A = NB_BLOCK_A, B = NB_BLOCK_B, C = NB_BLOCK_C, D = NB_BLOCK_D, P = NB_PORT;
-
-void enableHttpc(void *whatever) {
-	extern unsigned char *videosavepage;
-	memcpy((void*)FB_START,videosavepage,FB_SIZE);
-	VIDEO_ATTR=0xffef37;
-	printk("\n\n\n\n\n\n");
-	VIDEO_ATTR=0xffc8c8c8;
-	initialiseNetwork();
-	netBoot(A, B, C, D, P);
-}
+int ipA = NB_BLOCK_A, ipB = NB_BLOCK_B, ipC = NB_BLOCK_C, ipD = NB_BLOCK_D, ipP = NB_PORT;
 
 void incrementNumberA(void *num) {
 	char *text = (char *)num;
@@ -28,7 +18,29 @@ void incrementNumberA(void *num) {
 	if(n > 255) {
 		n = 0;
 	}
-	A = n;
+	ipA = n;
+	sprintf(text, "%s %i", "A: ", n);
+}
+
+void decrementNumberA(void *num) {
+	char *text = (char *)num;
+	int n = simple_strtol(num+4, NULL, 10);
+	n--;
+	if(n < 0) {
+		n = 255;
+	}
+	ipA = n;
+	sprintf(text, "%s %i", "A: ", n);
+}
+
+void skipTenA(void *num) {
+	char *text = (char *)num;
+	int n = simple_strtol(num+4, NULL, 10);
+	n += 10;
+	if(n > 255) {
+		n -= 256;
+	}
+	ipA = n;
 	sprintf(text, "%s %i", "A: ", n);
 }
 
@@ -39,9 +51,32 @@ void incrementNumberB(void *num) {
 	if(n > 255) {
 		n = 0;
 	}
-	B = n;
+	ipB = n;
 	sprintf(text, "%s %i", "B: ", n);
 }
+
+void decrementNumberB(void *num) {
+	char *text = (char *)num;
+	int n = simple_strtol(num+4, NULL, 10);
+	n--;
+	if(n < 0) {
+		n = 255;
+	}
+	ipB = n;
+	sprintf(text, "%s %i", "B: ", n);
+}
+
+void skipTenB(void *num) {
+	char *text = (char *)num;
+	int n = simple_strtol(num+4, NULL, 10);
+	n += 10;
+	if(n > 255) {
+		n -= 256;
+	}
+	ipB = n;
+	sprintf(text, "%s %i", "B: ", n);
+}
+
 
 void incrementNumberC(void *num) {
 	char *text = (char *)num;
@@ -50,7 +85,29 @@ void incrementNumberC(void *num) {
 	if(n > 255) {
 		n = 0;
 	}
-	C = n;
+	ipC = n;
+	sprintf(text, "%s %i", "C: ", n);
+}
+
+void decrementNumberC(void *num) {
+	char *text = (char *)num;
+	int n = simple_strtol(num+4, NULL, 10);
+	n--;
+	if(n < 0) {
+		n = 255;
+	}
+	ipC = n;
+	sprintf(text, "%s %i", "C: ", n);
+}
+
+void skipTenC(void *num) {
+	char *text = (char *)num;
+	int n = simple_strtol(num+4, NULL, 10);
+	n += 10;
+	if(n > 255) {
+		n -= 256;
+	}
+	ipC = n;
 	sprintf(text, "%s %i", "C: ", n);
 }
 
@@ -61,7 +118,29 @@ void incrementNumberD(void *num) {
 	if(n > 255) {
 		n = 1;
 	}
-	D = n;
+	ipD = n;
+	sprintf(text, "%s %i", "D: ", n);
+}
+
+void decrementNumberD(void *num) {
+	char *text = (char *)num;
+	int n = simple_strtol(num+4, NULL, 10);
+	n--;
+	if(n < 0) {
+		n = 255;
+	}
+	ipD = n;
+	sprintf(text, "%s %i", "D: ", n);
+}
+
+void skipTenD(void *num) {
+	char *text = (char *)num;
+	int n = simple_strtol(num+4, NULL, 10);
+	n += 10;
+	if(n > 255) {
+		n -= 255;
+	}
+	ipD = n;
 	sprintf(text, "%s %i", "D: ", n);
 }
 
@@ -72,6 +151,29 @@ void incrementNumberP(void *num) {
 	if(n > 65535) {
 		n = 1;
 	}
-	P = n;
+	ipP = n;
 	sprintf(text, "%s %i", "P: ", n);
 }
+
+void decrementNumberP(void *num) {
+	char *text = (char *)num;
+	int n = simple_strtol(num+4, NULL, 10);
+	n--;
+	if(n < 1) {
+		n = 65535;
+	}
+	ipP = n;
+	sprintf(text, "%s %i", "P: ", n);
+}
+
+void skipTenP(void *num) {
+	char *text = (char *)num;
+	int n = simple_strtol(num+4, NULL, 10);
+	n += 10;
+	if(n > 65535) {
+		n -= 65535;
+	}
+	ipP = n;
+	sprintf(text, "%s %i", "P: ", n);
+}
+

@@ -138,8 +138,7 @@ void InitNativeIcons(void) {
 						//Add an icon for this partition 
 						iconPtr = (ICON *)malloc(sizeof(ICON));
 			  			iconPtr->iconSlot = ICON_SOURCE_SLOT1;
-						iconPtr->szCaption=malloc(10);
-						sprintf(iconPtr->szCaption, "  Native");
+						iconPtr->szCaption="  Native";
 						iconPtr->functionPtr = DrawBootMenu;
 						iconPtr->functionDataPtr = (void *)entry;
 			  			AddIcon(iconPtr);

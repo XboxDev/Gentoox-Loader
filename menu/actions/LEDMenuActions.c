@@ -91,5 +91,5 @@ void LEDHeader(char *name, char *pattern) {
 }
 	
 void LEDFooter(void) {
-	while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(100);
+	while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(10);
 }

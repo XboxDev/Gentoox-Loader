@@ -7,8 +7,8 @@
 #include "memory_layout.h"
 #include <shared.h>
 
-static const char *requestGET  = "GET /sourceforge/xbox-linux/resctoox.t00x HTTP/1.0\n\n";
-static const char *requestHEAD = "HEAD /sourceforge/xbox-linux/resctoox.t00x HTTP/1.0\n\n";
+static char *requestGET;
+static char *requestHEAD;
 static int i = 0, initrdSize = 0, kernelSize = 0, hLen = 0, contLen = 0, fraction = 0;
 static int head = 1, progCheck = 0, eoh = 0, fileLen = 0;
 static char *tempBuf = (u8*)INITRD_START;
@@ -25,6 +25,7 @@ static void connErr(void *arg, err_t err);
 static int isdigit(char c);
 void bootPacklet(void);
 void processHeader(void);
+extern char *finalURL;
 
 static int isdigit(char c) {
 	return ((c) >= '0' && (c) <= '9');
@@ -95,6 +96,8 @@ void processPayload() {
 
 // Boot the Packlet
 void bootPacklet() {
+	free(requestGET);
+	free(requestHEAD);
 	eth_disable();
 	memPlaceKernel(tempBuf+initrdSize, kernelSize);
 	ExittoLinuxPacklet(initrdSize, appendLine);
@@ -105,7 +108,7 @@ static err_t recvPacklet(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t e
 	if(p == NULL) {
 		tcp_close(pcb);
 		if(head == 0) {
-			printk("EOF\n");
+			printk("Download finished - If nothing happens, your URL may be wrong.\n");
 			processPayload();
 			bootPacklet();
 		} else {
@@ -183,6 +186,12 @@ static err_t handlePacklet(void *arg, struct tcp_pcb *pcb, err_t err) {
 }
 
 void netboot_init(int A, int B, int C, int D, int P) {
+	requestGET = (char *)malloc(1024);
+	requestHEAD = (char *)malloc(1024);
+	memset(requestGET, 0, 1024);
+	memset(requestHEAD, 0, 1024);
+	sprintf(requestGET, "GET %s HTTP/1.0\n\n", finalURL);	
+	sprintf(requestHEAD, "HEAD %s HTTP/1.0\n\n", finalURL);	
 	contLen = progCheck = hLen = fileLen = eoh = 0;
 	head = 1;
 	contLen = 11*1024*1024;
@@ -211,5 +220,6 @@ void netboot_init(int A, int B, int C, int D, int P) {
 	tcp_connect(pcb, &ipaddr, port, handlePacklet);
 	cromwellSuccess();
 	printk("           Server: %i.%i.%i.%i:%i\n", A, B, C, D, P);
+	printk("           URL: %s\n", finalURL);
 	downloadingLED();
 }

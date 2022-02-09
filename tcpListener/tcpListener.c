@@ -15,6 +15,7 @@ int eth_poll_into(char *buf, int *len);
 
 int gotIP = 0;
 int applicationStarted = 0;
+int resetCount = 0;
 
 static struct pbuf *
 ebd_poll(struct netif *netif)
@@ -151,6 +152,9 @@ int run_lwip(int A, int B, int C, int D, int P)
 	printk("           Waiting for IP");
 	dots();
 	printk(" ");
+	applicationStarted = 0;
+	gotIP = 0;
+	resetCount = 0;
 	
 /*	IP4_ADDR(&gw, 192,168,99,1);
 	IP4_ADDR(&ipaddr, 192,168,99,2);
@@ -170,6 +174,13 @@ int run_lwip(int A, int B, int C, int D, int P)
    int divisor = 0;
 	int first = 1;
 	while (1) {
+		if(risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_C) == 1) {
+			if(resetCount >= 3) {
+				I2CRebootSlow();
+			}
+			resetCount++;
+		}
+
 		if (!ebd_wait(&netif, TCP_TMR_INTERVAL)) {
 			if (divisor++ == 60 * 4) {
 				if (first && netif.dhcp->state != DHCP_BOUND) {

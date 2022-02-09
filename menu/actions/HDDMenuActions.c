@@ -42,7 +42,7 @@ void LockHDD(void *driveId) {
 	printk("           Make a note of the password above.\n");
 	printk("           Press Button A to continue");
 
-	while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(100);
+	while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(10);
 }
 
 void UnlockHDD(void *driveId) {
@@ -62,7 +62,7 @@ void UnlockHDD(void *driveId) {
 	printk("\n\n\n\n\n           \2This drive is now unlocked.\n\n");
 	printk("           \2Press Button A to continue");
 
-	while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(100);
+	while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(10);
 }
 
 
@@ -93,5 +93,5 @@ void DisplayHDDPassword(void *driveId) {
 	VIDEO_ATTR=0xffffff;
 	printk("\n\n           Press Button A to continue.");
 
-	while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(100);
+	while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(10);
 }

@@ -1,7 +1,7 @@
 ////////////////////// compile-time options ////////////////////////////////
 
 //Gentoox Loader version number
-#define VERSION "6.01"
+#define VERSION "6.02"
 
 // selects between the supported video modes, see boot.h for enum listing those available
 //#define VIDEO_PREFERRED_MODE VIDEO_MODE_800x600
@@ -13,8 +13,11 @@
 //Uncomment to enable the 'advanced menu'
 #define ADVANCED_MENU
 
-//Time to wait in seconds before auto-selecting default item
+//Time to wait in seconds before auto-selecting default boot item
 #define BOOT_TIMEWAIT 5
+
+//Time to wait in seconds before auto-selecting default menu item
+#define MENU_TIMEWAIT 5
 
 //Uncomment to make connected Xpads rumble briefly at init.
 //#define XPAD_VIBRA_STARTUP

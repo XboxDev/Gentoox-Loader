@@ -12,8 +12,6 @@ INCLUDE = -I$(TOPDIR)/grub -I$(TOPDIR)/include -I$(TOPDIR)/ -I./ -I$(TOPDIR)/fs/
 	-I$(TOPDIR)/menu/iconmenu -I$(TOPDIR)/lwip/src/include \
 	-I$(TOPDIR)/lwip/src/include/ipv4
 
-LWIPDIR=$(TOPDIR)/lwip
-
 #These are intended to be non-overridable.
 CROM_CFLAGS=$(INCLUDE)
 
@@ -91,6 +89,7 @@ OBJECTS-CROM += $(TOPDIR)/obj/IconMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/TextMenu.o
 OBJECTS-CROM += $(TOPDIR)/obj/TextMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/IPMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/URLMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/VideoMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/ResetMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/HDDFlashMenuInit.o
@@ -105,6 +104,7 @@ OBJECTS-CROM += $(TOPDIR)/obj/InfoMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/ResetMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/FlashMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/IPMenuActions.o
+OBJECTS-CROM += $(TOPDIR)/obj/URLMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/HDDMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/CDMenuActions.o
 OBJECTS-CROM += $(TOPDIR)/obj/LEDMenuActions.o
@@ -160,7 +160,7 @@ OBJECTS-CROM += $(TOPDIR)/obj/xbox_main.o
 OBJECTS-CROM += $(TOPDIR)/obj/elf.o
 endif
 
-SUBDIRS += lwip tcpListener networktools
+SUBDIRS += tcpListener networktools
 OBJECTS-LWIP = $(addprefix $(TOPDIR)/obj/,mem.o memp.o netif.o pbuf.o raw.o stats.o sys.o tcp.o tcp_in.o tcp_out.o udp.o dhcp.o icmp.o ip.o inet.o ip_addr.o ip_frag.o etharp.o tcpListener.o netflash.o netboot.o webupdate.o)
 OBJECTS-CROM += $(OBJECTS-LWIP)
 

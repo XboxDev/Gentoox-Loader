@@ -8,22 +8,16 @@
  ***************************************************************************/
 #include "include/config.h"
 
-void incrementNumberA(void *num);
-void decrementNumberA(void *num);
-void skipTenA(void *num);
+void enableHttpc(void *whatever);
 
-void incrementNumberB(void *num);
-void decrementNumberB(void *num);
-void skipTenB(void *num);
-
-void incrementNumberC(void *num);
-void decrementNumberC(void *num);
-void skipTenC(void *num);
-
-void incrementNumberD(void *num);
-void decrementNumberD(void *num);
-void skipTenD(void *num);
-
-void incrementNumberP(void *num);
-void decrementNumberP(void *num);
-void skipTenP(void *num);
+void incrementAlphabet(void *chr);
+void decrementAlphabet(void *chr);
+void nextLetter(void *chr);
+void deleteLetter(void *chr);
+void setNum(void *chr);
+void setLC(void *chr);
+void setUC(void *chr);
+void setFullStop(void *chr);
+void setFSlash(void *chr);
+void setDash(void *chr);
+void setUScore(void *chr);
