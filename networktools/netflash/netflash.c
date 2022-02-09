@@ -27,7 +27,7 @@
  * This file is part of the lwIP TCP/IP stack.
  * 
  * Author: Adam Dunkels <adam@sics.se>
- *
+ * Modified: Thomas Pedley <gentoox@shallax.com>
  */
 
 #include "lwip/debug.h"
@@ -65,8 +65,8 @@ static char http_file2[] =
 static char http_file3[] = 
 #include "webContent/fail.html.h"
 ;
-static char http_file404[] = "HTTP/1.1 404 NOT FOUND\nContent-Type: text/html\nContent-Length: 11\n\nHello 404!\n";
-static char http_file500[] = "HTTP/1.1 500 Internal Server Error\nContent-Type: text/html\nContent-Length: 11\n\nError 500!\n";
+static char http_file404[] = "HTTP/1.1 404 NOT FOUND\r\nContent-Type: text/html\r\nContent-Length: 11\r\n\r\nHello 404!\n";
+static char http_file500[] = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\nContent-Length: 11\r\n\r\nError 500!\n";
 
 struct http_file {
 	int len;

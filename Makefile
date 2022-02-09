@@ -161,7 +161,7 @@ OBJECTS-CROM += $(TOPDIR)/obj/elf.o
 endif
 
 SUBDIRS += tcpListener networktools
-OBJECTS-LWIP = $(addprefix $(TOPDIR)/obj/,mem.o memp.o netif.o pbuf.o raw.o stats.o sys.o tcp.o tcp_in.o tcp_out.o udp.o dhcp.o icmp.o ip.o inet.o ip_addr.o ip_frag.o etharp.o tcpListener.o netflash.o netboot.o webupdate.o)
+OBJECTS-LWIP = $(addprefix $(TOPDIR)/obj/,mem.o memp.o netif.o pbuf.o raw.o stats.o sys.o tcp.o tcp_in.o tcp_out.o udp.o dhcp.o icmp.o ip.o inet.o ip_addr.o ip_frag.o etharp.o tcpListener.o netflash.o netboot.o webboot.o webupdate.o)
 OBJECTS-CROM += $(OBJECTS-LWIP)
 
 RESOURCES = $(TOPDIR)/obj/backdrop.elf

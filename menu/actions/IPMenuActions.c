@@ -9,7 +9,7 @@
 #include "IPMenuActions.h"
 #include "TextMenu.h"
 
-int ipA = NB_BLOCK_A, ipB = NB_BLOCK_B, ipC = NB_BLOCK_C, ipD = NB_BLOCK_D, ipP = NB_PORT;
+int ipA = WB_BLOCK_A, ipB = WB_BLOCK_B, ipC = WB_BLOCK_C, ipD = WB_BLOCK_D, ipP = WB_PORT;
 
 void incrementNumberA(void *num) {
 	char *text = (char *)num;

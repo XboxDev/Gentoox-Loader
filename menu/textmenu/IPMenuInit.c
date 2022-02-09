@@ -36,7 +36,7 @@ TEXTMENU *IPMenuInit(void) {
 	// A
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	sprintf(itemPtr->szCaption, "%s %i", "A: ", NB_BLOCK_A);
+	sprintf(itemPtr->szCaption, "%s %i", "A: ", WB_BLOCK_A);
 	itemPtr->functionPtr=skipTenA;
 	itemPtr->functionDataPtr = itemPtr->szCaption;
 	itemPtr->functionLeftPtr=decrementNumberA;
@@ -48,7 +48,7 @@ TEXTMENU *IPMenuInit(void) {
 	// B
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	sprintf(itemPtr->szCaption, "%s %i", "B: ", NB_BLOCK_B);
+	sprintf(itemPtr->szCaption, "%s %i", "B: ", WB_BLOCK_B);
 	itemPtr->functionPtr=skipTenB;
 	itemPtr->functionDataPtr = itemPtr->szCaption;
 	itemPtr->functionLeftPtr=decrementNumberB;
@@ -60,7 +60,7 @@ TEXTMENU *IPMenuInit(void) {
 	// C
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	sprintf(itemPtr->szCaption, "%s %i", "C: ", NB_BLOCK_C);
+	sprintf(itemPtr->szCaption, "%s %i", "C: ", WB_BLOCK_C);
 	itemPtr->functionPtr=skipTenC;
 	itemPtr->functionDataPtr = itemPtr->szCaption;
 	itemPtr->functionLeftPtr=decrementNumberC;
@@ -72,7 +72,7 @@ TEXTMENU *IPMenuInit(void) {
 	// D
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	sprintf(itemPtr->szCaption, "%s %i", "D: ", NB_BLOCK_D);
+	sprintf(itemPtr->szCaption, "%s %i", "D: ", WB_BLOCK_D);
 	itemPtr->functionPtr=skipTenD;
 	itemPtr->functionDataPtr = itemPtr->szCaption;
 	itemPtr->functionLeftPtr=decrementNumberD;
@@ -84,7 +84,7 @@ TEXTMENU *IPMenuInit(void) {
 	// P
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	sprintf(itemPtr->szCaption, "%s %i", "P: ", NB_PORT);
+	sprintf(itemPtr->szCaption, "%s %i", "P: ", WB_PORT);
 	itemPtr->functionPtr=skipTenP;
 	itemPtr->functionDataPtr = itemPtr->szCaption;
 	itemPtr->functionLeftPtr=decrementNumberP;

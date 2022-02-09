@@ -44,6 +44,15 @@ void BootFromCD(void *data) {
 	DrawBootMenu(config);
 }
 
+void BootFromNet(void *whatever) {
+   extern unsigned char *videosavepage;
+   memcpy((void*)FB_START,videosavepage,FB_SIZE);
+   VIDEO_ATTR=0xffef37;
+   VIDEO_ATTR=0xffc8c8c8;
+   initialiseNetwork();
+   netBoot();
+}
+
 void DrawBootMenu(void *rootEntry) {
 	//entry is the pointer to the root config entry
 	TEXTMENU *menu;

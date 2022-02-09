@@ -27,7 +27,7 @@ void enableHttpc(void *whatever) {
 	printk("\n\n\n\n\n\n");
 	VIDEO_ATTR=0xffc8c8c8;
 	initialiseNetwork();
-	netBoot(ipA, ipB, ipC, ipD, ipP);
+	webBoot(ipA, ipB, ipC, ipD, ipP);
 }
 
 void incrementAlphabet(void *chr) {

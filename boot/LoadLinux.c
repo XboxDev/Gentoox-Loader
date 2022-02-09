@@ -319,9 +319,10 @@ int LoadKernelFatX(CONFIGENTRY *config) {
 		cromwellSuccess();
 		//printk(" - %d %d bytes\n", dwInitrdSize,infoinitrd.fileRead);
 	} else {
-		cromwellError();
+		printk("           Boot: Skipping initrd");
+		dots();
+		cromwellSuccess();
 		dwInitrdSize=0;
-		while(1);
 	}
 	return true;
 }
@@ -526,6 +527,8 @@ int BootLoadFlashCD(int cdromId) {
 			}
 			wait_ms(10);
 		}						
+		busyLED();
+
 		busyLED();
 
 		busyLED();

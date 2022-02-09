@@ -208,7 +208,7 @@ int run_lwip(int A, int B, int C, int D, int P)
 			if(applicationStarted == 0) {
 				if((gotIP == 1) || (netif.dhcp->state == DHCP_BOUND)) {
 					wait_ms(2000);
-					if((A + B + C + D + P) <= 0) {
+					if(A == 1336) {
 						applicationStarted = 1;
 						printk("           Starting Net Flash");
 						dots();
@@ -218,11 +218,16 @@ int run_lwip(int A, int B, int C, int D, int P)
 						printk("           Starting Web Update");
 						dots();
 						webupdate_init();
-					} else {
+					} else if(A == 1338) {
 						applicationStarted = 1;
 						printk("           Starting Net Boot");
 						dots();
-					   netboot_init(A, B, C, D, P);
+						netboot_init();
+					} else {
+						applicationStarted = 1;
+						printk("           Starting Web Boot");
+						dots();
+					   webboot_init(A, B, C, D, P);
 					}
 				}
 			}

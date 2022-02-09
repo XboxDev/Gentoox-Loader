@@ -17,6 +17,7 @@
 
 void InitFatXIcons(void);
 void InitNativeIcons(void);
+void InitWebBootIcons(void);
 void InitNetBootIcons(void);
 
 void IconMenuInit(void) {
@@ -47,6 +48,7 @@ void IconMenuInit(void) {
 
 	// For booting a Packlet from the internet.
 #ifdef LWIP
+	InitWebBootIcons();
 	InitNetBootIcons();
 #endif
 
@@ -100,13 +102,23 @@ void InitFatXIcons(void) {
 	}
 }
 
+void InitWebBootIcons(void) {
+	ICON *iconPtr=NULL;
+	iconPtr = (ICON *)malloc(sizeof(ICON));
+  	iconPtr->iconSlot = ICON_SOURCE_SLOT3;
+	iconPtr->szCaption = "WebBoot";
+	iconPtr->functionPtr = AdvancedMenu;
+	iconPtr->functionDataPtr = (void *)IPMenuInit();
+	AddIcon(iconPtr);
+}
+
 void InitNetBootIcons(void) {
 	ICON *iconPtr=NULL;
 	iconPtr = (ICON *)malloc(sizeof(ICON));
   	iconPtr->iconSlot = ICON_SOURCE_SLOT3;
 	iconPtr->szCaption = "NetBoot";
-	iconPtr->functionPtr = AdvancedMenu;
-	iconPtr->functionDataPtr = (void *)IPMenuInit();
+	iconPtr->functionPtr = BootFromNet;
+	iconPtr->functionDataPtr = NULL;
 	AddIcon(iconPtr);
 }
 

@@ -1,4 +1,4 @@
-subdir += netboot netflash webupdate
+subdir += netboot netflash webboot webupdate
 
 include $(TOPDIR)/Rules.make
 
